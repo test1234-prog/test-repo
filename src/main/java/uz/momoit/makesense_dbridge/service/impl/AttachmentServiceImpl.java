@@ -3,9 +3,11 @@ package uz.momoit.makesense_dbridge.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uz.momoit.makesense_dbridge.domain.TaskCheckStatEnum;
 import uz.momoit.makesense_dbridge.repository.AttachmentRepository;
+import uz.momoit.makesense_dbridge.repository.EduResultHistoryRepository;
 import uz.momoit.makesense_dbridge.repository.LabelHistoryRepository;
 import uz.momoit.makesense_dbridge.repository.LabelRepository;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
@@ -19,7 +21,6 @@ import uz.momoit.makesense_dbridge.service.mapper.LabelMapper;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -31,15 +32,29 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private final LabelHistoryRepository labelHistoryRepository;
 
+    private final EduResultHistoryRepository eduResultHistoryRepository;
+
     private final LabelMapper labelMapper;
 
     private final LabelHistoryMapper labelHistoryMapper;
+
+    @Value("${aws.bucket}")
+    private  String BUCKET_NAME;
 
     private final Logger log = LoggerFactory.getLogger(AttachmentServiceImpl.class);
     @Override
     public List<ImageOfTaskResDTO> getImagesOfTask(Long attId) {
         log.debug("Rest request to get images by taskId: {} ", attId);
         return attachmentRepository.getImagesByTask(attId);
+    }
+
+    private String generateUrl(String path) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("https://");
+        sb.append(BUCKET_NAME);
+        sb.append(".amazonaws.com");
+        sb.append(path);
+        return sb.toString();
     }
 
     @Override
@@ -72,28 +87,29 @@ public class AttachmentServiceImpl implements AttachmentService {
         int VRIFYSTTUS;
         //1. update TB_EDU_RESULT
         for(CheckTaskDTO checkTaskDTO : checkTaskDTOS) {
+            //when "REJECTED" button clicked
             if(checkTaskDTO.getTaskCheckStatEnum() == TaskCheckStatEnum.OK) {
                 VRIFYSTTUS = 2;
                 //insert data to table TB_POINT
                 attachmentRepository.updateTbPoint(checkTaskDTO.getLoginId(), point, LocalDateTime.now());
                 attachmentRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), checkTaskDTO.getQcId(), point,LocalDateTime.now());
             }
+            //when "REJECTED" button clicked
             else {
                 VRIFYSTTUS = 3;
-                labelRepository
-                        .getLabelsByAttSeq(checkTaskDTO.getAttSeq())
-                        .stream().map(label -> labelMapper.toDto(label))
-                        .map(labelDto -> labelHistoryMapper.toEntity(labelDto))
-                        .map(labelHistoryRepository::save);
+
+                //all label values belong to image to insert TB_LABEL_DATA_HISTORY table
+                labelHistoryRepository.saveLabelHistory(checkTaskDTO.getAttSeq());
+                //TODO TB_EDU_RESULT_HISTORY
+                eduResultHistoryRepository.savedEduResultHistory(checkTaskDTO.getAttSeq());
                 attachmentRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), checkTaskDTO.getQcId(), 0L, LocalDateTime.now());
             }
         }
 
         //2. Update TB_TASK_DTL (All images approved TASK_DTL_STAT = 4, at least one rejected TASK_DTL_STAT = 5)
-        int dtlSeq=1;
-        attachmentRepository.checkApprovedImagesOfTask(dtlSeq);
+        attachmentRepository.checkApprovedImagesOfTask(taskId);
 
-        //3. Inset TB_EDU_HISTORY(All images approved STATUS = 2, at least one rejected STATUS = 3)
+        //3. Inset TB_EDU_RESULT(All images approved VRIFYSTTUS = 2, at least one rejected VRIFYSTTUS = 3)
 
     }
 }

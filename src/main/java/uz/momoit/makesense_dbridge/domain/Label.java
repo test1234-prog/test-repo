@@ -14,7 +14,7 @@ public class Label {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "lb_sq")
+    @Column(name = "lb_seq")
     private Long labelSeq;
 
     @Column(name = "att_seq")

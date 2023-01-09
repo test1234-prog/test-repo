@@ -16,7 +16,7 @@ import java.util.List;
 @Repository
 public interface AttachmentRepository extends JpaRepository<RootEntity, Integer> {
 
-    @Query(value = "select t.ATT_SEQ attSeq, t.DTL_SEQ dtlSeq, concat(t.PATH, '/', t.Name) path, t.EXT, t.SIZE, " +
+    @Query(value = "select t.ATT_SEQ attSeq, t.DTL_SEQ dtlSeq, t.NAME, concat(t.PATH, '/', t.Name) path, t.EXT, t.SIZE, " +
                                                                  "COALESCE((select " +
                                                                     "case " +
                                                                           "when e.VRIFYSTTUS = 1 then 'UNCHECKED' " +
@@ -85,7 +85,7 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                                                     "(select count(dtl_seq) from TB_EDU_RESULT where dtl_seq = :dtlSeq and vrifysttus=2)) then 4 " +
                                               "else 5 end " +
                    "where dtl_seq = :dtlSeq", nativeQuery = true)
-    void checkApprovedImagesOfTask(int dtlSeq);
+    void checkApprovedImagesOfTask(Long dtlSeq);
 
     @Transactional
     @Modifying
