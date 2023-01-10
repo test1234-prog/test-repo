@@ -24,10 +24,13 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                                                                           "when e.VRIFYSTTUS = 3 then 'REJECTED' " +
                                                                      "end "+
                                                                     "from TB_EDU_RESULT e " +
-                                                                   "where e.ATT_SEQ = t.att_seq), 'UNDONE') status " +
+                                                                   "where e.ATT_SEQ = t.ATT_SEQ), 'UNDONE') status " +
                      "from TB_ATT t " +
-                    "where t.dtl_seq = :dtlSeq ", nativeQuery = true)
-    List<ImageOfTaskResDTO> getImagesByTask(Long dtlSeq);
+                     "join TB_TASK_DTL d " +
+                       "on t.DTL_SEQ = d.DTL_SEQ " +
+                    "where t.dtl_seq = :dtlSeq " +
+                      "and d.LOGIN_ID = :userId", nativeQuery = true)
+    List<ImageOfTaskResDTO> getImagesByTask(String userId, Long dtlSeq);
 
     @Query(value = "select case when count(*) > 0 then true else false end " +
                      "from TB_EDU_RESULT e " +

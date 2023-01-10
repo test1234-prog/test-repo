@@ -8,7 +8,7 @@ import java.util.List;
 
 
 public interface AttachmentService {
-    List<ImageOfTaskResDTO> getImagesOfTask(Long attId);
+    List<ImageOfTaskResDTO> getImagesOfTask(String userId, Long attId);
 
     void save(List<LabelDTO> labelDTOS, Long dtlSeq);
 
