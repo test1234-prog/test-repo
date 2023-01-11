@@ -31,13 +31,13 @@ public class AWSController {
      * @param objectName (PATH + NAME columns table of TB_ATT)
      * @return This method return File object from AWS S3
      */
-    @GetMapping(value = "/object")
-    @Operation(summary = "get image from AWS S3 file storage",
-               description = "This method return image as file"
-    )
-    public File downloadObject(@RequestParam String objectName) {
-        log.debug("Rest request to get image from AWS S3 objectName: {}", objectName);
-        s3Service.downloadObject(BUCKET_NAME, objectName);
-        return new File("./" + objectName);
-    }
+//    @GetMapping(value = "/object")
+//    @Operation(summary = "get image from AWS S3 file storage",
+//               description = "This method return image as file"
+//    )
+//    public File downloadObject(@RequestParam String objectName) {
+//        log.debug("Rest request to get image from AWS S3 objectName: {}", objectName);
+//        s3Service.downloadObject(BUCKET_NAME, objectName);
+//        return new File("./" + objectName);
+//    }
 }
