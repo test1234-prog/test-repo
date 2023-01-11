@@ -1,5 +1,6 @@
 package uz.momoit.makesense_dbridge.web.rest;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,10 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
-import uz.momoit.makesense_dbridge.service.dto.CheckTaskDTO;
-import uz.momoit.makesense_dbridge.service.dto.ImageOfTaskReqDTO;
-import uz.momoit.makesense_dbridge.service.dto.ImageOfTaskResDTO;
-import uz.momoit.makesense_dbridge.service.dto.LabelDTO;
+import uz.momoit.makesense_dbridge.service.LabelService;
+import uz.momoit.makesense_dbridge.service.dto.*;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -21,12 +20,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.springframework.web.bind.annotation.RequestMethod.*;
+import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
+
 @RestController
+@CrossOrigin(origins = "*", maxAge = 3600, exposedHeaders = "*",methods = {POST, GET, PUT, PATCH, DELETE, OPTIONS}, allowedHeaders = "*")
 @RequestMapping(value = "/api")
 @RequiredArgsConstructor
 public class AttachmentController {
 
     private final AttachmentService attachmentService;
+
+    private final LabelService labelService;
 
     private final Logger log = LoggerFactory.getLogger(AttachmentController.class);
 
@@ -53,29 +58,9 @@ public class AttachmentController {
         attachmentService.checkTask(checkTaskDTOS, taskId);
     }
 
-    @GetMapping(
-            value = "/import-annotation",
-            produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public void importAnnotation(Long loginId, Long qcId, Long taskId, List<HttpServletResponse> responses) throws IOException {
-        log.debug("Rest request to get files, taskId: {} ", taskId);
-        String myString = "Hello";
-        HttpServletResponse response = null;
-        response.setContentType("text/plain");
-        response.setHeader("Content-Disposition","attachment;filename=myFile.txt");
-        ServletOutputStream out = response.getOutputStream();
-        out.println(myString);
-        out.flush();
-        out.close();
-
-        HttpServletResponse response1 = null;
-        response1.setContentType("text/plain");
-        response1.setHeader("Content-Disposition","attachment;filename=myFile.txt");
-        ServletOutputStream out1= response.getOutputStream();
-        out1.println(myString);
-        out1.flush();
-        out1.close();
-
-        responses.add(response);
-        responses.add(response1);
+    @GetMapping(value = "/import-annotation")
+    public List<LabelsImportDTO> importAnnotation(@RequestParam Long dtlSeq) {
+        log.debug("Rest request to get files, taskId: {} ", dtlSeq);
+        return labelService.convertLabelToYolo(dtlSeq);
     }
 }
