@@ -101,4 +101,15 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                                        "from TB_TASK_DTL " +
                                       "where dtl_seq = :taskId)", nativeQuery = true)
     Long getPointByTaskId(Long taskId);
+
+    @Query(value = "select att_seq " +
+                     "from TB_ATT " +
+                    "where dtl_seq = :dtlSeq", nativeQuery = true)
+    List<Long> getAttachmentIdsByDtSeq(Long dtlSeq);
+
+
+    @Query(value = "select VRIFYSTTUS " +
+                     "from TB_EDU_RESULT " +
+                    "where ATT_SEQ = :attSeq", nativeQuery = true)
+    String getVrifySttusByAttSeq(Long attSeq);
 }
