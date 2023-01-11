@@ -14,7 +14,7 @@
     <name>makesense_dbridge</name>
     <description>makesense_dbridge</description>
     <properties>
-        <java.version>11</java.version>
+        <java.version>1.8</java.version>
         <mapstruct.version>1.5.2.Final</mapstruct.version>
     </properties>
     <dependencies>
