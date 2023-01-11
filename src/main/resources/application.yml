@@ -23,3 +23,7 @@ springdoc:
 #bucket name for get images from AWS S3 file storage
 aws:
   bucket: makesense-s
+
+server:
+  base:
+    url: https://makesense-bridge-production.up.railway.app/
