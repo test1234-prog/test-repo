@@ -3,6 +3,7 @@ package uz.momoit.makesense_dbridge.service.impl;
 import org.springframework.stereotype.Service;
 import uz.momoit.makesense_dbridge.domain.VrifysttusEnum;
 import uz.momoit.makesense_dbridge.repository.AttachmentRepository;
+import uz.momoit.makesense_dbridge.repository.EduResultRepository;
 import uz.momoit.makesense_dbridge.repository.LabelRepository;
 import uz.momoit.makesense_dbridge.service.LabelService;
 import uz.momoit.makesense_dbridge.service.dto.LabelsImportDTO;
@@ -18,9 +19,12 @@ public class LabelServiceImpl implements LabelService {
 
     private final AttachmentRepository attachmentRepository;
 
-    public LabelServiceImpl(LabelRepository labelRepository, AttachmentRepository attachmentRepository) {
+    private final EduResultRepository eduResultRepository;
+
+    public LabelServiceImpl(LabelRepository labelRepository, AttachmentRepository attachmentRepository, EduResultRepository eduResultRepository) {
         this.labelRepository = labelRepository;
         this.attachmentRepository = attachmentRepository;
+        this.eduResultRepository = eduResultRepository;
     }
 
     @Override
@@ -33,7 +37,7 @@ public class LabelServiceImpl implements LabelService {
                         null,
                         getYoloDTOByAttSeq(attSeq)))
                 .map(labelsImportDTO -> {
-                    String vrifySttusByAttSeq = attachmentRepository.getVrifySttusByAttSeq(labelsImportDTO.getAttSeq());
+                    String vrifySttusByAttSeq = eduResultRepository.getVrifySttusByAttSeq(labelsImportDTO.getAttSeq());
                     if(vrifySttusByAttSeq == null) {
                         labelsImportDTO.setVrifysttus(VrifysttusEnum.UNDONE.name());
                         return labelsImportDTO;

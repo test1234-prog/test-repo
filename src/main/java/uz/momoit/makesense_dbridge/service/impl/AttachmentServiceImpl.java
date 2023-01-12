@@ -6,10 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uz.momoit.makesense_dbridge.domain.TaskCheckStatEnum;
-import uz.momoit.makesense_dbridge.repository.AttachmentRepository;
-import uz.momoit.makesense_dbridge.repository.EduResultHistoryRepository;
-import uz.momoit.makesense_dbridge.repository.LabelHistoryRepository;
-import uz.momoit.makesense_dbridge.repository.LabelRepository;
+import uz.momoit.makesense_dbridge.repository.*;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
 import uz.momoit.makesense_dbridge.service.TaskDtlDTO;
 import uz.momoit.makesense_dbridge.service.dto.CheckTaskDTO;
@@ -32,7 +29,11 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private final LabelHistoryRepository labelHistoryRepository;
 
+    private final EduResultRepository eduResultRepository;
+
     private final EduResultHistoryRepository eduResultHistoryRepository;
+
+    private final TaskDtlRepository taskDtlRepository;
 
     private final LabelMapper labelMapper;
 
@@ -62,22 +63,22 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         // delete labels from TB_LABEL_DATA
         List<Long> attSeqIds = labelDTOS.stream().map(x -> x.getAttSeq()).collect(Collectors.toList());
-        attachmentRepository.deleteLabelData(attSeqIds);
+        labelRepository.deleteLabelData(attSeqIds);
 
         for(LabelDTO labelDTO : labelDTOS) {
           //1. insert or update tb_edu_result
-          if(!(attachmentRepository.checkEduResult(labelDTO.getAttSeq()) > 0)) {
+          if(!(eduResultRepository.checkEduResult(labelDTO.getAttSeq()) > 0)) {
               //insert
               TaskDtlDTO taskDtl = attachmentRepository.getTaskDtl(labelDTO.getAttSeq());
-              attachmentRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0","1");
+              eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0","1");
           }
           //2. insert or update tb_label_data
               //delete all label
               attachmentRepository.insertLabelData(labelDTO.getAttSeq(),labelDTO.getLabelName(),labelDTO.getLabelOrder(),labelDTO.getBboxX(),labelDTO.getBboxY(),labelDTO.getBboxWidth(),labelDTO.getBboxWidth(), labelDTO.getImgWidth(), labelDTO.getImgHeight());
         }
         //3. update TB_TASK_DTL
-        attachmentRepository.updateTaskDtlProg(dtlSeq);
-        attachmentRepository.updateTaskDtlStatus(dtlSeq);
+        taskDtlRepository.updateTaskDtlProg(dtlSeq);
+        taskDtlRepository.updateTaskDtlStatus(dtlSeq);
     }
 
     @Override
@@ -92,7 +93,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 VRIFYSTTUS = 2;
                 //insert data to table TB_POINT
                 attachmentRepository.updateTbPoint(checkTaskDTO.getLoginId(), point, LocalDateTime.now());
-                attachmentRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), checkTaskDTO.getQcId(), point,LocalDateTime.now());
+                eduResultRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), checkTaskDTO.getQcId(), point,LocalDateTime.now());
             }
             //when "REJECTED" button clicked
             else {
@@ -102,12 +103,12 @@ public class AttachmentServiceImpl implements AttachmentService {
                 labelHistoryRepository.saveLabelHistory(checkTaskDTO.getAttSeq());
                 //TODO TB_EDU_RESULT_HISTORY
                 eduResultHistoryRepository.savedEduResultHistory(checkTaskDTO.getAttSeq());
-                attachmentRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), checkTaskDTO.getQcId(), 0L, LocalDateTime.now());
+                eduResultRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), checkTaskDTO.getQcId(), 0L, LocalDateTime.now());
             }
         }
 
         //2. Update TB_TASK_DTL (All images approved TASK_DTL_STAT = 4, at least one rejected TASK_DTL_STAT = 5)
-        attachmentRepository.checkApprovedImagesOfTask(taskId);
+        taskDtlRepository.checkApprovedImagesOfTask(taskId);
 
         //3. Inset TB_EDU_RESULT(All images approved VRIFYSTTUS = 2, at least one rejected VRIFYSTTUS = 3)
 

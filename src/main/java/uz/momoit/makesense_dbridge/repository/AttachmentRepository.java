@@ -32,16 +32,7 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                       "and d.LOGIN_ID = :userId", nativeQuery = true)
     List<ImageOfTaskResDTO> getImagesByTask(String userId, Long dtlSeq);
 
-    @Query(value = "select case when count(*) > 0 then true else false end " +
-                     "from TB_EDU_RESULT e " +
-                    "where e.att_seq = :attSeq", nativeQuery = true)
-    Integer checkEduResult(Long attSeq);
 
-    @Transactional
-    @Modifying
-    @Query(value = "insert into TB_EDU_RESULT(login_id, edu_seq, dtl_seq, att_seq, status, comptpoint, vrifysttus)" +
-                    " values(:login_id, :edu_seq, :dtl_seq, :att_seq, :status, :comptpoint, :vrifysttus) ", nativeQuery = true)
-    void insertEduResult(String login_id, Long edu_seq, Long dtl_seq, Long att_seq, String status, String comptpoint, String vrifysttus);
 
     @Query(value = "select t.DTL_SEQ dtlSeq, t.EDU_SEQ eduSeq, t.LOGIN_ID loginId " +
                      "from TB_TASK_DTL t " +
@@ -54,41 +45,7 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
             " values(:att_seq, :label_name, :label_order, :bbox_x, :bbox_y, :bbox_width, :bbox_height, :img_width, :img_height)", nativeQuery = true)
     void insertLabelData(Long att_seq, String label_name, int label_order, int bbox_x, int bbox_y, int bbox_width, int bbox_height, int img_width, int img_height);
 
-    @Transactional
-    @Modifying
-    @Query(value = "update TB_TASK_DTL set TASK_DTL_PROG = " +
-                                            "(100*(select count(*) from TB_EDU_RESULT e where e.DTL_SEQ = :dtl_seq and e.STATUS = 'OK')/" +
-                                            "(select count(t.ATT_SEQ) from TB_ATT t where t.DTL_SEQ = :dtl_seq)) " +
-                    "where DTL_SEQ = :dtl_seq", nativeQuery = true)
-    void updateTaskDtlProg(Long dtl_seq);
 
-    @Transactional
-    @Modifying
-    @Query(value = "update TB_TASK_DTL set TASK_DTL_PROG = 100 " +
-                    "where DTL_SEQ = :dtl_seq " +
-                      "and TASK_DTL_PROG = 100", nativeQuery = true)
-    void updateTaskDtlStatus(Long dtl_seq);
-
-    @Transactional
-    @Modifying
-    @Query(value = "delete from TB_LABEL_DATA where ATT_SEQ in :ids ", nativeQuery = true)
-    void deleteLabelData(@Param("ids")List<Long> ids);
-
-    @Query(value = "update TB_EDU_RESULT " +
-                      "set VRIFYSTTUS = :i, QC_ID = :qcId, QC_DT = :now, COMPTPOINT = :point " +
-                    "where ATT_SEQ = :attSeq ", nativeQuery = true)
-    void updateEduResult(int i, Long attSeq, Long qcId, Long point, LocalDateTime now);
-
-
-    @Transactional
-    @Modifying
-    @Query(value = "update TB_TASK_DTL " +
-                      "set TASK_DTL_STAT = case " +
-                                              "when ((select count(dtl_seq) from TB_ATT where dtl_seq = :dtlSeq) = " +
-                                                    "(select count(dtl_seq) from TB_EDU_RESULT where dtl_seq = :dtlSeq and vrifysttus=2)) then 4 " +
-                                              "else 5 end " +
-                   "where dtl_seq = :dtlSeq", nativeQuery = true)
-    void checkApprovedImagesOfTask(Long dtlSeq);
 
     @Transactional
     @Modifying
@@ -108,8 +65,4 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
     List<Long> getAttachmentIdsByDtSeq(Long dtlSeq);
 
 
-    @Query(value = "select VRIFYSTTUS " +
-                     "from TB_EDU_RESULT " +
-                    "where ATT_SEQ = :attSeq", nativeQuery = true)
-    String getVrifySttusByAttSeq(Long attSeq);
 }
