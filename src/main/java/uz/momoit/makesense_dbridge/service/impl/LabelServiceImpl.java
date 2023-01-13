@@ -6,6 +6,7 @@ import uz.momoit.makesense_dbridge.repository.AttachmentRepository;
 import uz.momoit.makesense_dbridge.repository.EduResultRepository;
 import uz.momoit.makesense_dbridge.repository.LabelRepository;
 import uz.momoit.makesense_dbridge.service.LabelService;
+import uz.momoit.makesense_dbridge.service.dto.LabelOrdersDTO;
 import uz.momoit.makesense_dbridge.service.dto.LabelsImportDTO;
 import uz.momoit.makesense_dbridge.service.dto.YoloDTO;
 
@@ -61,6 +62,11 @@ public class LabelServiceImpl implements LabelService {
                     }
                             return labelsImportDTO;
                 }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<LabelOrdersDTO> getLabelOrders(Long dtlSeq) {
+        return labelRepository.getLabelOrdersByDtlSeq(dtlSeq);
     }
 
     private List<YoloDTO> getYoloDTOByAttSeq(Long attSeq) {

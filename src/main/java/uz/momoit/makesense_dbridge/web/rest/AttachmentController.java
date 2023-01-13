@@ -63,4 +63,10 @@ public class AttachmentController {
         log.debug("Rest request to get files, taskId: {} ", dtlSeq);
         return labelService.convertLabelToYolo(dtlSeq);
     }
+
+    @GetMapping(value = "/label-orders")
+    public List<LabelOrdersDTO> getLabelOrders(@RequestParam Long dtlSeq) {
+        log.debug("Rest request to get files, taskId: {} ", dtlSeq);
+        return labelService.getLabelOrders(dtlSeq);
+    }
 }
