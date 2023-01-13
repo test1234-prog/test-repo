@@ -3,11 +3,15 @@ package uz.momoit.makesense_dbridge.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uz.momoit.makesense_dbridge.domain.EduResult;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalLong;
 
 @Repository
 public interface EduResultRepository extends JpaRepository<EduResult, Long> {
@@ -33,5 +37,11 @@ public interface EduResultRepository extends JpaRepository<EduResult, Long> {
                      "from TB_EDU_RESULT " +
                     "where ATT_SEQ = :attSeq", nativeQuery = true)
     String getVrifySttusByAttSeq(Long attSeq);
+
+    @Query(value = "select count(*) " +
+                     "from TB_EDU_RESULT " +
+                    "where ATT_SEQ in :attSeqId " +
+                      "and VRIFYSTTUS = 2", nativeQuery = true)
+    Long checkExistsApprovedImage(@Param("attSeqId") List<Long> attSeqId);
 
 }

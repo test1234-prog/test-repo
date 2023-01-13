@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@OpenAPIDefinition(info = @Info(title = "Makesense API", version = "v1", description = "${api.description}"), servers = @Server(url = "${server.base.url}"))
+//@OpenAPIDefinition(info = @Info(title = "Makesense API", version = "v1", description = "${api.description}"), servers = @Server(url = "${server.base.url}"))
 @SecurityScheme(
         name = "bearerAuth",
         type = SecuritySchemeType.HTTP,

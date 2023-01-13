@@ -41,12 +41,6 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                                          "where a.ATT_SEQ = :attSeq)", nativeQuery = true)
     TaskDtlDTO getTaskDtl(Long attSeq);
 
-    @Query(value = "insert into TB_LABEL_DATA(att_seq,label_name, label_order, bbox_x, bbox_y, bbox_width, bbox_height, img_width, img_height)" +
-            " values(:att_seq, :label_name, :label_order, :bbox_x, :bbox_y, :bbox_width, :bbox_height, :img_width, :img_height)", nativeQuery = true)
-    void insertLabelData(Long att_seq, String label_name, int label_order, int bbox_x, int bbox_y, int bbox_width, int bbox_height, int img_width, int img_height);
-
-
-
     @Transactional
     @Modifying
     @Query(value = "insert into TB_POINT(login_id, nowpoint, lastupdde) values(:loginId,:point, :now) ", nativeQuery = true)

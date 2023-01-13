@@ -14,6 +14,7 @@ import uz.momoit.makesense_dbridge.service.dto.ImageOfTaskResDTO;
 import uz.momoit.makesense_dbridge.service.dto.LabelDTO;
 import uz.momoit.makesense_dbridge.service.mapper.LabelHistoryMapper;
 import uz.momoit.makesense_dbridge.service.mapper.LabelMapper;
+import uz.momoit.makesense_dbridge.web.rest.errors.BadRequestAlertException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -61,8 +62,13 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public void save(List<LabelDTO> labelDTOS, Long dtlSeq) {
 
-        // delete labels from TB_LABEL_DATA
         List<Long> attSeqIds = labelDTOS.stream().map(x -> x.getAttSeq()).collect(Collectors.toList());
+        //check if image is approved , it is not edit
+        if(eduResultRepository.checkExistsApprovedImage(attSeqIds) > 0) {
+            throw new BadRequestAlertException("Image is approved, it is not edit", "Attachment", "imageApproved");
+        }
+
+        // delete labels from TB_LABEL_DATA
         labelRepository.deleteLabelData(attSeqIds);
 
         for(LabelDTO labelDTO : labelDTOS) {
@@ -72,9 +78,20 @@ public class AttachmentServiceImpl implements AttachmentService {
               TaskDtlDTO taskDtl = attachmentRepository.getTaskDtl(labelDTO.getAttSeq());
               eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0","1");
           }
-          //2. insert or update tb_label_data
-              //delete all label
-              attachmentRepository.insertLabelData(labelDTO.getAttSeq(),labelDTO.getLabelName(),labelDTO.getLabelOrder(),labelDTO.getBboxX(),labelDTO.getBboxY(),labelDTO.getBboxWidth(),labelDTO.getBboxWidth(), labelDTO.getImgWidth(), labelDTO.getImgHeight());
+
+            //2.get label order
+            Long aLong = labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
+                    .stream()
+                    .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(x -> x.getLabelOrder())
+                    .findFirst()
+                    .orElse(
+                        labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
+                                .stream()
+                                .map(x1->x1.getLabelOrder())
+                                .max(Long::compareTo).map(x2->x2+1).orElse(0L)
+                    );
+            //3. insert or update tb_label_data
+            labelRepository.insertLabelData(labelDTO.getAttSeq(),labelDTO.getLabelName(),aLong,labelDTO.getBboxX(),labelDTO.getBboxY(),labelDTO.getBboxWidth(),labelDTO.getBboxWidth(), labelDTO.getImgWidth(), labelDTO.getImgHeight());
         }
         //3. update TB_TASK_DTL
         taskDtlRepository.updateTaskDtlProg(dtlSeq);
@@ -88,7 +105,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         int VRIFYSTTUS;
         //1. update TB_EDU_RESULT
         for(CheckTaskDTO checkTaskDTO : checkTaskDTOS) {
-            //when "REJECTED" button clicked
+            //when "OK" button clicked
             if(checkTaskDTO.getTaskCheckStatEnum() == TaskCheckStatEnum.OK) {
                 VRIFYSTTUS = 2;
                 //insert data to table TB_POINT
