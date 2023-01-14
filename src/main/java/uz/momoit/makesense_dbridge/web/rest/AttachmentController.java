@@ -1,6 +1,8 @@
 package uz.momoit.makesense_dbridge.web.rest;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.OPTIONS;
 @CrossOrigin(origins = "*", maxAge = 3600, exposedHeaders = "*",methods = {POST, GET, PUT, PATCH, DELETE, OPTIONS}, allowedHeaders = "*")
 @RequestMapping(value = "/api")
 @RequiredArgsConstructor
+@Tag(name = "Attachment")
 public class AttachmentController {
 
     private final AttachmentService attachmentService;
@@ -41,30 +44,40 @@ public class AttachmentController {
      * @return List of images by taskId
      */
     @GetMapping(value="/listOfImagesByTask")
+    @Operation(summary = "List of images by task",
+               description = "This method returns list of images are attached to the task")
     public List<ImageOfTaskResDTO> listOfImages(@Valid ImageOfTaskReqDTO imageOfTaskDTO) {
         log.debug("Rest request to get images by task. taskID:{}", imageOfTaskDTO.getDtlSeq());
         return attachmentService.getImagesOfTask(imageOfTaskDTO.getUserId(), imageOfTaskDTO.getDtlSeq());
     }
 
     @PostMapping(value = "/save")
+    @Operation(summary = "Save annotation of image",
+               description = "To export annotation save to db")
     public void saveAnnotation(@Valid @RequestBody List<LabelDTO> labelDTOS, @RequestParam Long dtlSeq) {
         log.debug("Rest request export annotation to save to db");
         attachmentService.save(labelDTOS, dtlSeq);
     }
 
     @PostMapping(value = "/check-task")
+    @Operation(summary = "to check task by inspector",
+               description = "save result of checking task")
     public void checkTasks(@Valid @RequestBody List<CheckTaskDTO> checkTaskDTOS, @RequestParam Long taskId) {
         log.debug("Rest request to check task");
         attachmentService.checkTask(checkTaskDTOS, taskId);
     }
 
     @GetMapping(value = "/import-annotation")
+    @Operation(summary = "get data for import annotation",
+               description = "get data YOLO format for import annotation")
     public List<LabelsImportDTO> importAnnotation(@RequestParam Long dtlSeq) {
         log.debug("Rest request to get files, taskId: {} ", dtlSeq);
         return labelService.convertLabelToYolo(dtlSeq);
     }
 
     @GetMapping(value = "/label-orders")
+    @Operation(summary = "get labelName and labelOrders for import annotation by task Id",
+               description = "get label orders")
     public List<LabelOrdersDTO> getLabelOrders(@RequestParam Long dtlSeq) {
         log.debug("Rest request to get files, taskId: {} ", dtlSeq);
         return labelService.getLabelOrders(dtlSeq);
