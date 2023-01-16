@@ -37,7 +37,7 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
                                                            "where TB_ATT.ATT_SEQ = :attSeq))", nativeQuery = true)
     List<LabelOrdersDTO> getLabelOrderIdByAttSeqAndName(Long attSeq);
 
-    @Query(value = "select distinct l.LABEL_ORDER as labelOrder, l.LABEL_NAME as labelName " +
+    @Query(value = "select distinct l.LABEL_ORDER + 1 as labelOrder, l.LABEL_NAME as labelName " +
                      "from TB_LABEL_DATA l " +
                     "where l.ATT_SEQ in (select TB_ATT.ATT_SEQ " +
                                           "from TB_ATT " +
