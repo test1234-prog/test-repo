@@ -1,7 +1,7 @@
 package uz.momoit.makesense_dbridge.service.impl;
 
 import org.springframework.stereotype.Service;
-import uz.momoit.makesense_dbridge.domain.VrifysttusEnum;
+import uz.momoit.makesense_dbridge.domain.enumeration.VrifysttusEnum;
 import uz.momoit.makesense_dbridge.repository.AttachmentRepository;
 import uz.momoit.makesense_dbridge.repository.EduResultRepository;
 import uz.momoit.makesense_dbridge.repository.LabelRepository;
