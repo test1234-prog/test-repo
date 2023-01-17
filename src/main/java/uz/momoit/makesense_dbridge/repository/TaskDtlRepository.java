@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import uz.momoit.makesense_dbridge.domain.TaskDtl;
+import uz.momoit.makesense_dbridge.service.dto.TaskDtlDTO;
 
 import javax.transaction.Transactional;
 
@@ -35,4 +36,9 @@ public interface TaskDtlRepository extends JpaRepository<TaskDtl, Long> {
             "else 5 end " +
             "where dtl_seq = :dtlSeq", nativeQuery = true)
     void checkApprovedImagesOfTask(Long dtlSeq);
+
+    @Query(value = "select DTL_SEQ dtlSeq, EDU_SEQ eduSeq, LOGIN_ID loginId, TASK_DTL_PROG taskDtlProg, TASK_DTL_STAT taskDtlStat, QC_ID qcId " +
+                     "from TB_TASK_DTL " +
+                    "where dtl_seq = :dtlSeq", nativeQuery = true)
+    TaskDtlDTO getTaskDtlByDtlSeq(Long dtlSeq);
 }

@@ -11,8 +11,6 @@ import uz.momoit.makesense_dbridge.domain.enumeration.TaskCheckStatEnum;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CheckTaskDTO {
-    private Long loginId;
     private Long attSeq;
-    private Long qcId;
     private TaskCheckStatEnum taskCheckStatEnum;
 }

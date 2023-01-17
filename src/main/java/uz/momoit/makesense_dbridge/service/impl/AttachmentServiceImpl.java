@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import uz.momoit.makesense_dbridge.domain.enumeration.TaskCheckStatEnum;
 import uz.momoit.makesense_dbridge.repository.*;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
-import uz.momoit.makesense_dbridge.service.TaskDtlDTO;
+import uz.momoit.makesense_dbridge.service.dto.TaskDtlDTO;
 import uz.momoit.makesense_dbridge.service.dto.CheckTaskDTO;
 import uz.momoit.makesense_dbridge.service.dto.ImageOfTaskResDTO;
 import uz.momoit.makesense_dbridge.service.dto.LabelDTO;
@@ -99,7 +99,20 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public void checkTask(List<CheckTaskDTO> checkTaskDTOS, Long taskId) {
+    public void checkTask(List<CheckTaskDTO> checkTaskDTOS, Long taskId, String loginId, String qcId) {
+        TaskDtlDTO taskDtlDTO = taskDtlRepository.getTaskDtlByDtlSeq(taskId);
+        if(taskDtlDTO == null) {
+            throw new BadRequestAlertException("Task not found", "Task", "taskNotFound");
+        }
+        if(taskDtlDTO.getQcId() != qcId) {
+            throw new BadRequestAlertException("Task is not allowed to check  by this Inspector!", "Task", "checkNotAllowedTask");
+        }
+        //check if image is approved , it is not edit
+        List<Long> attSeqList = checkTaskDTOS.stream().map(checkTaskDTO -> checkTaskDTO.getAttSeq()).collect(Collectors.toList());
+        if(eduResultRepository.checkExistsApprovedImage(attSeqList) > 0) {
+            throw new BadRequestAlertException("Image is approved, it is not allowed to check", "Attachment", "notCheckApprovedImage");
+        }
+
         // get point from TB_EDU_MST.POINT (the point is given for each image in the same value)
         Long point = attachmentRepository.getPointByTaskId(taskId);
         int VRIFYSTTUS;
@@ -109,8 +122,8 @@ public class AttachmentServiceImpl implements AttachmentService {
             if(checkTaskDTO.getTaskCheckStatEnum() == TaskCheckStatEnum.OK) {
                 VRIFYSTTUS = 2;
                 //insert data to table TB_POINT
-                attachmentRepository.updateTbPoint(checkTaskDTO.getLoginId(), point, LocalDateTime.now());
-                eduResultRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), checkTaskDTO.getQcId(), point,LocalDateTime.now());
+                attachmentRepository.updateTbPoint(loginId, point, LocalDateTime.now());
+                eduResultRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), qcId, point,LocalDateTime.now());
             }
             //when "REJECTED" button clicked
             else {
@@ -120,7 +133,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 labelHistoryRepository.saveLabelHistory(checkTaskDTO.getAttSeq());
                 //TODO TB_EDU_RESULT_HISTORY
                 eduResultHistoryRepository.savedEduResultHistory(checkTaskDTO.getAttSeq());
-                eduResultRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), checkTaskDTO.getQcId(), 0L, LocalDateTime.now());
+                eduResultRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), qcId, 0L, LocalDateTime.now());
             }
         }
 

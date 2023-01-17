@@ -6,7 +6,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
@@ -62,9 +64,12 @@ public class AttachmentController {
     @PostMapping(value = "/check-task")
     @Operation(summary = "to check task by inspector",
                description = "save result of checking task")
-    public void checkTasks(@Valid @RequestBody List<CheckTaskDTO> checkTaskDTOS, @RequestParam Long taskId) {
+    public void checkTasks(@Valid @RequestBody List<CheckTaskDTO> checkTaskDTOS,
+                           @RequestParam Long taskId,
+                           @RequestParam String loginId,
+                           @RequestParam String qcId) {
         log.debug("Rest request to check task");
-        attachmentService.checkTask(checkTaskDTOS, taskId);
+        attachmentService.checkTask(checkTaskDTOS, taskId, loginId, qcId);
     }
 
     @GetMapping(value = "/import-annotation")

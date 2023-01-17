@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uz.momoit.makesense_dbridge.domain.EduResult;
+import uz.momoit.makesense_dbridge.service.dto.RootEntity;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ import java.util.Optional;
 import java.util.OptionalLong;
 
 @Repository
-public interface EduResultRepository extends JpaRepository<EduResult, Long> {
+public interface EduResultRepository extends JpaRepository<RootEntity, Long> {
 
     @Query(value = "select case when count(*) > 0 then true else false end " +
                      "from TB_EDU_RESULT e " +
@@ -28,10 +29,12 @@ public interface EduResultRepository extends JpaRepository<EduResult, Long> {
     void insertEduResult(String login_id, Long edu_seq, Long dtl_seq, Long att_seq, String status, String comptpoint, String vrifysttus);
 
 
+    @Transactional
+    @Modifying
     @Query(value = "update TB_EDU_RESULT " +
                       "set VRIFYSTTUS = :i, QC_ID = :qcId, QC_DT = :now, COMPTPOINT = :point " +
                     "where ATT_SEQ = :attSeq ", nativeQuery = true)
-    void updateEduResult(int i, Long attSeq, Long qcId, Long point, LocalDateTime now);
+    void updateEduResult(int i, Long attSeq, String qcId, Long point, LocalDateTime now);
 
     @Query(value = "select VRIFYSTTUS " +
                      "from TB_EDU_RESULT " +

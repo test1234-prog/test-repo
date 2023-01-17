@@ -3,9 +3,8 @@ package uz.momoit.makesense_dbridge.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import uz.momoit.makesense_dbridge.service.TaskDtlDTO;
+import uz.momoit.makesense_dbridge.service.dto.TaskDtlDTO;
 import uz.momoit.makesense_dbridge.service.dto.ImageOfTaskResDTO;
 import uz.momoit.makesense_dbridge.service.dto.RootEntity;
 
@@ -44,7 +43,7 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
     @Transactional
     @Modifying
     @Query(value = "insert into TB_POINT(login_id, nowpoint, lastupdde) values(:loginId,:point, :now) ", nativeQuery = true)
-    void updateTbPoint(Long loginId, Long point, LocalDateTime now);
+    void updateTbPoint(String loginId, Long point, LocalDateTime now);
 
     @Query(value = "select point " +
                      "from TB_EDU_MST " +

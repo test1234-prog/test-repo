@@ -12,5 +12,5 @@ public interface AttachmentService {
 
     void save(List<LabelDTO> labelDTOS, Long dtlSeq);
 
-    void checkTask(List<CheckTaskDTO> checkTaskDTOS, Long taskId);
+    void checkTask(List<CheckTaskDTO> checkTaskDTOS, Long taskId, String loginId, String qcId);
 }
