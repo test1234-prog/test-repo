@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import uz.momoit.makesense_dbridge.domain.TaskCheckStatEnum;
+import uz.momoit.makesense_dbridge.domain.enumeration.TaskCheckStatEnum;
 
 @Getter
 @Setter
