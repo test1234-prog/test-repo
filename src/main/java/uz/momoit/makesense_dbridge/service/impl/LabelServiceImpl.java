@@ -5,9 +5,11 @@ import uz.momoit.makesense_dbridge.domain.enumeration.VrifysttusEnum;
 import uz.momoit.makesense_dbridge.repository.AttachmentRepository;
 import uz.momoit.makesense_dbridge.repository.EduResultRepository;
 import uz.momoit.makesense_dbridge.repository.LabelRepository;
+import uz.momoit.makesense_dbridge.repository.TaskDtlRepository;
 import uz.momoit.makesense_dbridge.service.LabelService;
 import uz.momoit.makesense_dbridge.service.dto.LabelOrdersDTO;
 import uz.momoit.makesense_dbridge.service.dto.LabelsImportDTO;
+import uz.momoit.makesense_dbridge.service.dto.TaskDtlDTO;
 import uz.momoit.makesense_dbridge.service.dto.YoloDTO;
 
 import java.util.List;
@@ -22,20 +24,26 @@ public class LabelServiceImpl implements LabelService {
 
     private final EduResultRepository eduResultRepository;
 
-    public LabelServiceImpl(LabelRepository labelRepository, AttachmentRepository attachmentRepository, EduResultRepository eduResultRepository) {
+    private final TaskDtlRepository taskDtlRepository;
+
+    public LabelServiceImpl(LabelRepository labelRepository, AttachmentRepository attachmentRepository, EduResultRepository eduResultRepository, TaskDtlRepository taskDtlRepository) {
         this.labelRepository = labelRepository;
         this.attachmentRepository = attachmentRepository;
         this.eduResultRepository = eduResultRepository;
+        this.taskDtlRepository = taskDtlRepository;
     }
 
     @Override
     public List<LabelsImportDTO> convertLabelToYolo(Long dtlSeq) {
+        TaskDtlDTO taskDtlByDtlSeq = taskDtlRepository.getTaskDtlByDtlSeq(dtlSeq);
         List<Long> attachmentIdsByDtSeq = attachmentRepository.getAttachmentIdsByDtSeq(dtlSeq);
         return attachmentIdsByDtSeq.stream()
                 .map(attSeq ->
                     new LabelsImportDTO(
                         attSeq,
                         null,
+                        taskDtlByDtlSeq.getLoginId(),
+                        taskDtlByDtlSeq.getQcId(),
                         getYoloDTOByAttSeq(attSeq)))
                 .map(labelsImportDTO -> {
                     String vrifySttusByAttSeq = eduResultRepository.getVrifySttusByAttSeq(labelsImportDTO.getAttSeq());

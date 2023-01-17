@@ -17,5 +17,9 @@ public class LabelsImportDTO {
 
     private String vrifysttus;
 
+    private String loginId;
+
+    private String qcId;
+
     List<YoloDTO> yoloDTOS;
 }
