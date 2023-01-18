@@ -50,7 +50,7 @@ public class AttachmentController {
                description = "This method returns list of images are attached to the task")
     public List<ImageOfTaskResDTO> listOfImages(@Valid ImageOfTaskReqDTO imageOfTaskDTO) {
         log.debug("Rest request to get images by task. taskID:{}", imageOfTaskDTO.getDtlSeq());
-        return attachmentService.getImagesOfTask(imageOfTaskDTO.getUserId(), imageOfTaskDTO.getDtlSeq());
+        return attachmentService.getImagesOfTask(imageOfTaskDTO.getUserId(), imageOfTaskDTO.isQcCheck(), imageOfTaskDTO.getDtlSeq());
     }
 
     @PostMapping(value = "/save")

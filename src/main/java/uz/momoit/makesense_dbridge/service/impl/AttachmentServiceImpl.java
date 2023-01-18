@@ -45,9 +45,10 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private final Logger log = LoggerFactory.getLogger(AttachmentServiceImpl.class);
     @Override
-    public List<ImageOfTaskResDTO> getImagesOfTask(String userId, Long attId) {
+    public List<ImageOfTaskResDTO> getImagesOfTask(String userId, Boolean qcCheck, Long attId) {
         log.debug("Rest request to get images by taskId: {} ", attId);
-        return attachmentRepository.getImagesByTask(userId, attId);
+        String qcChk = qcCheck ? "Y" : "N";
+        return attachmentRepository.getImagesByTask(userId, qcChk, attId);
     }
 
     private String generateUrl(String path) {

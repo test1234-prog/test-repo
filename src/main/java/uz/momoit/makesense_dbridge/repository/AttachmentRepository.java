@@ -28,8 +28,8 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                      "join TB_TASK_DTL d " +
                        "on t.DTL_SEQ = d.DTL_SEQ " +
                     "where t.dtl_seq = :dtlSeq " +
-                      "and d.LOGIN_ID = :userId", nativeQuery = true)
-    List<ImageOfTaskResDTO> getImagesByTask(String userId, Long dtlSeq);
+                      "and (d.LOGIN_ID = :userId or 'Y' = :qcChk)", nativeQuery = true)
+    List<ImageOfTaskResDTO> getImagesByTask(String userId, String qcChk, Long dtlSeq);
 
 
 
