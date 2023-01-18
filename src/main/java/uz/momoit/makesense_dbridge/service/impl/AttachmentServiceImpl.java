@@ -8,10 +8,7 @@ import org.springframework.stereotype.Service;
 import uz.momoit.makesense_dbridge.domain.enumeration.TaskCheckStatEnum;
 import uz.momoit.makesense_dbridge.repository.*;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
-import uz.momoit.makesense_dbridge.service.dto.TaskDtlDTO;
-import uz.momoit.makesense_dbridge.service.dto.CheckTaskDTO;
-import uz.momoit.makesense_dbridge.service.dto.ImageOfTaskResDTO;
-import uz.momoit.makesense_dbridge.service.dto.LabelDTO;
+import uz.momoit.makesense_dbridge.service.dto.*;
 import uz.momoit.makesense_dbridge.service.mapper.LabelHistoryMapper;
 import uz.momoit.makesense_dbridge.service.mapper.LabelMapper;
 import uz.momoit.makesense_dbridge.web.rest.errors.BadRequestAlertException;
@@ -63,7 +60,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public void save(List<LabelDTO> labelDTOS, Long dtlSeq) {
         log.debug("Rest request to save labels with dtlSeq: {} ", dtlSeq);
-        List<Long> attSeqIds = labelDTOS.stream().map(x -> x.getAttSeq()).collect(Collectors.toList());
+        List<Long> attSeqIds = labelDTOS.stream().map(LabelDTO::getAttSeq).collect(Collectors.toList());
         //check if image is approved , it is not edit
         if(eduResultRepository.checkExistsApprovedImage(attSeqIds) > 0) {
             throw new BadRequestAlertException("Image is approved, it is not edit", "Attachment", "imageApproved");
@@ -74,7 +71,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         for(LabelDTO labelDTO : labelDTOS) {
           //1. insert or update tb_edu_result
-          if(!(eduResultRepository.checkEduResult(labelDTO.getAttSeq()) > 0)) {
+          if(eduResultRepository.checkEduResult(labelDTO.getAttSeq()) == 0) {
               //insert
               TaskDtlDTO taskDtl = attachmentRepository.getTaskDtl(labelDTO.getAttSeq());
               eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0","1");
@@ -83,12 +80,12 @@ public class AttachmentServiceImpl implements AttachmentService {
         //2.get label order
         Long aLong = labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
                 .stream()
-                .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(x -> x.getLabelOrder())
+                .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(LabelOrdersDTO::getLabelOrder)
                 .findFirst()
                 .orElse(
                     labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
                             .stream()
-                            .map(x1->x1.getLabelOrder())
+                            .map(LabelOrdersDTO::getLabelOrder)
                             .max(Long::compareTo).map(x2->x2+1).orElse(0L)
                 );
         //3. insert or update tb_label_data
@@ -107,11 +104,11 @@ public class AttachmentServiceImpl implements AttachmentService {
         if(taskDtlDTO == null) {
             throw new BadRequestAlertException("Task not found", "Task", "taskNotFound");
         }
-        if(taskDtlDTO.getQcId() != qcId) {
+        if(taskDtlDTO.getQcId().equals(qcId)) {
             throw new BadRequestAlertException("Task is not allowed to check  by this Inspector!", "Task", "checkNotAllowedTask");
         }
         //check if image is approved , it is not edit
-        List<Long> attSeqList = checkTaskDTOS.stream().map(checkTaskDTO -> checkTaskDTO.getAttSeq()).collect(Collectors.toList());
+        List<Long> attSeqList = checkTaskDTOS.stream().map(CheckTaskDTO::getAttSeq).collect(Collectors.toList());
         if(eduResultRepository.checkExistsApprovedImage(attSeqList) > 0) {
             throw new BadRequestAlertException("Image is approved, it is not allowed to check", "Attachment", "notCheckApprovedImage");
         }
