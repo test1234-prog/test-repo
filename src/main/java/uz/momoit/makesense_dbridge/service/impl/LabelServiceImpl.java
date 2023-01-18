@@ -1,5 +1,7 @@
 package uz.momoit.makesense_dbridge.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import uz.momoit.makesense_dbridge.domain.enumeration.VrifysttusEnum;
 import uz.momoit.makesense_dbridge.repository.AttachmentRepository;
@@ -26,6 +28,8 @@ public class LabelServiceImpl implements LabelService {
 
     private final TaskDtlRepository taskDtlRepository;
 
+    private final Logger log = LoggerFactory.getLogger(LabelServiceImpl.class);
+
     public LabelServiceImpl(LabelRepository labelRepository, AttachmentRepository attachmentRepository, EduResultRepository eduResultRepository, TaskDtlRepository taskDtlRepository) {
         this.labelRepository = labelRepository;
         this.attachmentRepository = attachmentRepository;
@@ -35,6 +39,7 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public List<LabelsImportDTO> convertLabelToYolo(Long dtlSeq) {
+        log.debug("Rest request to convert label to yolo: {} ", dtlSeq);
         TaskDtlDTO taskDtlByDtlSeq = taskDtlRepository.getTaskDtlByDtlSeq(dtlSeq);
         List<Long> attachmentIdsByDtSeq = attachmentRepository.getAttachmentIdsByDtSeq(dtlSeq);
         return attachmentIdsByDtSeq.stream()
@@ -78,6 +83,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     private List<YoloDTO> getYoloDTOByAttSeq(Long attSeq) {
+        log.debug("Rest request to get yoloDTO by attSeq: {} ", attSeq);
         return labelRepository.getLabelsByAttSeq(attSeq).stream().map(label -> {
             YoloDTO yoloDTO = new YoloDTO();
             yoloDTO.setLabelOrder(label.getLabelOrder());

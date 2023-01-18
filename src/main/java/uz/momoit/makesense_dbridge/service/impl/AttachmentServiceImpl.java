@@ -62,7 +62,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public void save(List<LabelDTO> labelDTOS, Long dtlSeq) {
-
+        log.debug("Rest request to save labels with dtlSeq: {} ", dtlSeq);
         List<Long> attSeqIds = labelDTOS.stream().map(x -> x.getAttSeq()).collect(Collectors.toList());
         //check if image is approved , it is not edit
         if(eduResultRepository.checkExistsApprovedImage(attSeqIds) > 0) {
@@ -80,27 +80,29 @@ public class AttachmentServiceImpl implements AttachmentService {
               eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0","1");
           }
 
-            //2.get label order
-            Long aLong = labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
-                    .stream()
-                    .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(x -> x.getLabelOrder())
-                    .findFirst()
-                    .orElse(
-                        labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
-                                .stream()
-                                .map(x1->x1.getLabelOrder())
-                                .max(Long::compareTo).map(x2->x2+1).orElse(0L)
-                    );
-            //3. insert or update tb_label_data
-            labelRepository.insertLabelData(labelDTO.getAttSeq(),labelDTO.getLabelName(),aLong,labelDTO.getBboxX(),labelDTO.getBboxY(),labelDTO.getBboxWidth(),labelDTO.getBboxHeight(), labelDTO.getImgWidth(), labelDTO.getImgHeight());
+        //2.get label order
+        Long aLong = labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
+                .stream()
+                .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(x -> x.getLabelOrder())
+                .findFirst()
+                .orElse(
+                    labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
+                            .stream()
+                            .map(x1->x1.getLabelOrder())
+                            .max(Long::compareTo).map(x2->x2+1).orElse(0L)
+                );
+        //3. insert or update tb_label_data
+        labelRepository.insertLabelData(labelDTO.getAttSeq(),labelDTO.getLabelName(),aLong,labelDTO.getBboxX(),labelDTO.getBboxY(),labelDTO.getBboxWidth(),labelDTO.getBboxHeight(), labelDTO.getImgWidth(), labelDTO.getImgHeight());
         }
         //3. update TB_TASK_DTL
         taskDtlRepository.updateTaskDtlProg(dtlSeq);
         taskDtlRepository.updateTaskDtlStatus(dtlSeq);
+        log.debug("Successfully saved labels with dtlSeq: {} ", dtlSeq);
     }
 
     @Override
     public void checkTask(List<CheckTaskDTO> checkTaskDTOS, Long taskId, String loginId, String qcId) {
+        log.debug("Rest request to check task with taskId: {} ", taskId);
         TaskDtlDTO taskDtlDTO = taskDtlRepository.getTaskDtlByDtlSeq(taskId);
         if(taskDtlDTO == null) {
             throw new BadRequestAlertException("Task not found", "Task", "taskNotFound");
@@ -142,6 +144,6 @@ public class AttachmentServiceImpl implements AttachmentService {
         taskDtlRepository.checkApprovedImagesOfTask(taskId);
 
         //3. Inset TB_EDU_RESULT(All images approved VRIFYSTTUS = 2, at least one rejected VRIFYSTTUS = 3)
-
+        log.debug("successfully checked task with taskId: {} ", taskId);
     }
 }
