@@ -104,7 +104,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         if(taskDtlDTO == null) {
             throw new BadRequestAlertException("Task not found", "Task", "taskNotFound");
         }
-        if(taskDtlDTO.getQcId().equals(qcId)) {
+        if(!taskDtlDTO.getQcId().equals(qcId.toLowerCase())) {
             throw new BadRequestAlertException("Task is not allowed to check  by this Inspector!", "Task", "checkNotAllowedTask");
         }
         //check if image is approved , it is not edit

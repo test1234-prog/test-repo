@@ -27,8 +27,11 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                      "from TB_ATT t " +
                      "join TB_TASK_DTL d " +
                        "on t.DTL_SEQ = d.DTL_SEQ " +
+                     "join TB_EDU_RESULT e " +
+                       "on  e.ATT_SEQ = t.ATT_SEQ " +
                     "where t.dtl_seq = :dtlSeq " +
-                      "and (d.LOGIN_ID = :userId or 'Y' = :qcChk)", nativeQuery = true)
+                      "and (d.LOGIN_ID = :userId or 'Y' = :qcChk)" +
+                      "and ('N'= :qcChk and e.VRIFYSTTUS <> 2 or 'Y' = :qcChk)", nativeQuery = true) // if qcChk = true return all images, else return only not approved images
     List<ImageOfTaskResDTO> getImagesByTask(String userId, String qcChk, Long dtlSeq);
 
 
