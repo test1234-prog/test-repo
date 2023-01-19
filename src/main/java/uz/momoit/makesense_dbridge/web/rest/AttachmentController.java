@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
 import uz.momoit.makesense_dbridge.service.LabelService;
 import uz.momoit.makesense_dbridge.service.dto.*;
+import uz.momoit.makesense_dbridge.domain.projection.ImageOfTaskResProjection;
+import uz.momoit.makesense_dbridge.domain.projection.LabelOrdersProjection;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -37,7 +39,7 @@ public class AttachmentController {
     @GetMapping(value="/listOfImagesByTask")
     @Operation(summary = "List of images by task",
                description = "This method returns list of images are attached to the task")
-    public List<ImageOfTaskResDTO> listOfImages(@Valid ImageOfTaskReqDTO imageOfTaskDTO) {
+    public List<ImageOfTaskResProjection> listOfImages(@Valid ImageOfTaskReqDTO imageOfTaskDTO) {
         log.debug("Rest request to get images by task. taskID:{}", imageOfTaskDTO.getDtlSeq());
         return attachmentService.getImagesOfTask(imageOfTaskDTO.getUserId(), imageOfTaskDTO.isQcCheck(), imageOfTaskDTO.getDtlSeq());
     }
@@ -72,7 +74,7 @@ public class AttachmentController {
     @GetMapping(value = "/label-orders")
     @Operation(summary = "get labelName and labelOrders for import annotation by task Id",
                description = "get label orders")
-    public List<LabelOrdersDTO> getLabelOrders(@RequestParam Long dtlSeq) {
+    public List<LabelOrdersProjection> getLabelOrders(@RequestParam Long dtlSeq) {
         log.debug("Rest request to get files, taskId: {} ", dtlSeq);
         return labelService.getLabelOrders(dtlSeq);
     }

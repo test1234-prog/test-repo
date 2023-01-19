@@ -11,6 +11,9 @@ import uz.momoit.makesense_dbridge.service.AttachmentService;
 import uz.momoit.makesense_dbridge.service.dto.*;
 import uz.momoit.makesense_dbridge.service.mapper.LabelHistoryMapper;
 import uz.momoit.makesense_dbridge.service.mapper.LabelMapper;
+import uz.momoit.makesense_dbridge.domain.projection.ImageOfTaskResProjection;
+import uz.momoit.makesense_dbridge.domain.projection.LabelOrdersProjection;
+import uz.momoit.makesense_dbridge.domain.projection.TaskDtlProjection;
 import uz.momoit.makesense_dbridge.web.rest.errors.BadRequestAlertException;
 
 import java.time.LocalDateTime;
@@ -42,7 +45,7 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private final Logger log = LoggerFactory.getLogger(AttachmentServiceImpl.class);
     @Override
-    public List<ImageOfTaskResDTO> getImagesOfTask(String userId, Boolean qcCheck, Long attId) {
+    public List<ImageOfTaskResProjection> getImagesOfTask(String userId, Boolean qcCheck, Long attId) {
         log.debug("Rest request to get images by taskId: {} ", attId);
         String qcChk = qcCheck ? "Y" : "N";
         return attachmentRepository.getImagesByTask(userId, qcChk, attId);
@@ -77,19 +80,19 @@ public class AttachmentServiceImpl implements AttachmentService {
           //1. insert or update tb_edu_result
           if(eduResultRepository.checkEduResult(labelDTO.getAttSeq()) == 0) {
               //insert
-              TaskDtlDTO taskDtl = attachmentRepository.getTaskDtl(labelDTO.getAttSeq());
+              TaskDtlProjection taskDtl = taskDtlRepository.getTaskDtl(labelDTO.getAttSeq());
               eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0","1");
           }
 
         //2.get label order
         Long aLong = labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
                 .stream()
-                .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(LabelOrdersDTO::getLabelOrder)
+                .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(LabelOrdersProjection::getLabelOrder)
                 .findFirst()
                 .orElse(
                     labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
                             .stream()
-                            .map(LabelOrdersDTO::getLabelOrder)
+                            .map(LabelOrdersProjection::getLabelOrder)
                             .max(Long::compareTo).map(x2->x2+1).orElse(0L)
                 );
         //3. insert or update tb_label_data
@@ -104,7 +107,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public void checkTask(List<CheckTaskDTO> checkTaskDTOS, Long taskId, String loginId, String qcId) {
         log.debug("Rest request to check task with taskId: {} ", taskId);
-        TaskDtlDTO taskDtlDTO = taskDtlRepository.getTaskDtlByDtlSeq(taskId);
+        TaskDtlProjection taskDtlDTO = taskDtlRepository.getTaskDtlByDtlSeq(taskId);
         if(taskDtlDTO == null) {
             throw new BadRequestAlertException("Task not found", "Task", "taskNotFound");
         }

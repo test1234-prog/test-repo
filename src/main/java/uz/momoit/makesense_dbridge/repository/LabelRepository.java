@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uz.momoit.makesense_dbridge.domain.Label;
-import uz.momoit.makesense_dbridge.service.dto.LabelOrdersDTO;
+import uz.momoit.makesense_dbridge.domain.projection.LabelOrdersProjection;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -35,7 +35,7 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
                                          "where DTL_SEQ = (select DTL_SEQ " +
                                                             "from TB_ATT " +
                                                            "where TB_ATT.ATT_SEQ = :attSeq))", nativeQuery = true)
-    List<LabelOrdersDTO> getLabelOrderIdByAttSeqAndName(Long attSeq);
+    List<LabelOrdersProjection> getLabelOrderIdByAttSeqAndName(Long attSeq);
 
     @Query(value = "select distinct l.LABEL_ORDER + 1 as labelOrder, l.LABEL_NAME as labelName " +
                      "from TB_LABEL_DATA l " +
@@ -43,5 +43,5 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
                                           "from TB_ATT " +
                                          "where DTL_SEQ = :dtlSeq) " +
                  "order by labelOrder", nativeQuery = true)
-    List<LabelOrdersDTO> getLabelOrdersByDtlSeq(Long dtlSeq);
+    List<LabelOrdersProjection> getLabelOrdersByDtlSeq(Long dtlSeq);
 }

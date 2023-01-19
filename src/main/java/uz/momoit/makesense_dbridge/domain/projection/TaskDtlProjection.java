@@ -1,7 +1,7 @@
-package uz.momoit.makesense_dbridge.service.dto;
+package uz.momoit.makesense_dbridge.domain.projection;
 
 
-public interface TaskDtlDTO {
+public interface TaskDtlProjection {
 
     Long getDtlSeq();
     Long getEduSeq();

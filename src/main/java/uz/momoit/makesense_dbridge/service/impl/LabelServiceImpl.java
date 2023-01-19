@@ -9,9 +9,9 @@ import uz.momoit.makesense_dbridge.repository.EduResultRepository;
 import uz.momoit.makesense_dbridge.repository.LabelRepository;
 import uz.momoit.makesense_dbridge.repository.TaskDtlRepository;
 import uz.momoit.makesense_dbridge.service.LabelService;
-import uz.momoit.makesense_dbridge.service.dto.LabelOrdersDTO;
+import uz.momoit.makesense_dbridge.domain.projection.LabelOrdersProjection;
 import uz.momoit.makesense_dbridge.service.dto.LabelsImportDTO;
-import uz.momoit.makesense_dbridge.service.dto.TaskDtlDTO;
+import uz.momoit.makesense_dbridge.domain.projection.TaskDtlProjection;
 import uz.momoit.makesense_dbridge.service.dto.YoloDTO;
 
 import java.util.List;
@@ -40,7 +40,7 @@ public class LabelServiceImpl implements LabelService {
     @Override
     public List<LabelsImportDTO> convertLabelToYolo(Long dtlSeq) {
         log.debug("Rest request to convert label to yolo: {} ", dtlSeq);
-        TaskDtlDTO taskDtlByDtlSeq = taskDtlRepository.getTaskDtlByDtlSeq(dtlSeq);
+        TaskDtlProjection taskDtlByDtlSeq = taskDtlRepository.getTaskDtlByDtlSeq(dtlSeq);
         List<Long> attachmentIdsByDtSeq = attachmentRepository.getAttachmentIdsByDtSeq(dtlSeq);
         return attachmentIdsByDtSeq.stream()
                 .map(attSeq ->
@@ -78,7 +78,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public List<LabelOrdersDTO> getLabelOrders(Long dtlSeq) {
+    public List<LabelOrdersProjection> getLabelOrders(Long dtlSeq) {
         return labelRepository.getLabelOrdersByDtlSeq(dtlSeq);
     }
 

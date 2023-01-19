@@ -4,8 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import uz.momoit.makesense_dbridge.service.dto.TaskDtlDTO;
-import uz.momoit.makesense_dbridge.service.dto.ImageOfTaskResDTO;
+import uz.momoit.makesense_dbridge.domain.projection.ImageOfTaskResProjection;
 import uz.momoit.makesense_dbridge.service.dto.RootEntity;
 
 import javax.transaction.Transactional;
@@ -32,16 +31,7 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                     "where t.dtl_seq = :dtlSeq " +
                       "and (d.LOGIN_ID = :userId or 'Y' = :qcChk)" +
                       "and ('N'= :qcChk and e.VRIFYSTTUS <> 2 or 'Y' = :qcChk)", nativeQuery = true) // if qcChk = true return all images, else return only not approved images
-    List<ImageOfTaskResDTO> getImagesByTask(String userId, String qcChk, Long dtlSeq);
-
-
-
-    @Query(value = "select t.DTL_SEQ dtlSeq, t.EDU_SEQ eduSeq, t.LOGIN_ID loginId " +
-                     "from TB_TASK_DTL t " +
-                    "where t.DTL_SEQ in (select a.DTL_SEQ " +
-                                          "from TB_ATT a " +
-                                         "where a.ATT_SEQ = :attSeq)", nativeQuery = true)
-    TaskDtlDTO getTaskDtl(Long attSeq);
+    List<ImageOfTaskResProjection> getImagesByTask(String userId, String qcChk, Long dtlSeq);
 
     @Transactional
     @Modifying

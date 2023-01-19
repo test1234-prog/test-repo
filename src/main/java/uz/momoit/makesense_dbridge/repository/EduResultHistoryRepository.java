@@ -3,10 +3,10 @@ package uz.momoit.makesense_dbridge.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import uz.momoit.makesense_dbridge.domain.EduResultHistory;
+import uz.momoit.makesense_dbridge.service.dto.RootEntity;
 
 @Repository
-public interface EduResultHistoryRepository extends JpaRepository<EduResultHistory, Long> {
+public interface EduResultHistoryRepository extends JpaRepository<RootEntity, Long> {
 
 
     @Query(value = "insert " +
