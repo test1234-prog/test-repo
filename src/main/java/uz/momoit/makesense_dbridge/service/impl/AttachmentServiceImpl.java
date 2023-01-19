@@ -66,7 +66,11 @@ public class AttachmentServiceImpl implements AttachmentService {
             throw new BadRequestAlertException("Image is approved, it is not edit", "Attachment", "imageApproved");
         }
 
-        // delete labels from TB_LABEL_DATA
+        // save TB_LABEL_DATA_HISTORY table
+        for (Long attSeqId : attSeqIds) {
+            labelHistoryRepository.saveLabelHistory(attSeqId);
+        }
+        // delete labels from TB_LABEL_DATA table
         labelRepository.deleteLabelData(attSeqIds);
 
         for(LabelDTO labelDTO : labelDTOS) {
