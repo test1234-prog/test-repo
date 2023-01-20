@@ -4,9 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import uz.momoit.makesense_dbridge.domain.projection.ImageOfTaskResProjection;
 import uz.momoit.makesense_dbridge.service.dto.RootEntity;
 
+import javax.persistence.Tuple;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,7 +31,7 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                     "where t.dtl_seq = :dtlSeq " +
                       "and (d.LOGIN_ID = :userId or 'Y' = :qcChk)" +
                       "and ('N'= :qcChk and e.VRIFYSTTUS <> 2 or 'Y' = :qcChk)", nativeQuery = true) // if qcChk = true return all images, else return only not approved images
-    List<ImageOfTaskResProjection> getImagesByTask(String userId, String qcChk, Long dtlSeq);
+    List<Tuple> getImagesByTask(String userId, String qcChk, Long dtlSeq);
 
     @Transactional
     @Modifying

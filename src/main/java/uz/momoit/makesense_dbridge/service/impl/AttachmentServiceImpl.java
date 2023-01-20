@@ -9,13 +9,11 @@ import uz.momoit.makesense_dbridge.domain.enumeration.TaskCheckStatEnum;
 import uz.momoit.makesense_dbridge.repository.*;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
 import uz.momoit.makesense_dbridge.service.dto.*;
-import uz.momoit.makesense_dbridge.service.mapper.LabelHistoryMapper;
-import uz.momoit.makesense_dbridge.service.mapper.LabelMapper;
-import uz.momoit.makesense_dbridge.domain.projection.ImageOfTaskResProjection;
 import uz.momoit.makesense_dbridge.domain.projection.LabelOrdersProjection;
 import uz.momoit.makesense_dbridge.domain.projection.TaskDtlProjection;
 import uz.momoit.makesense_dbridge.web.rest.errors.BadRequestAlertException;
 
+import javax.persistence.Tuple;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,28 +34,27 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private final TaskDtlRepository taskDtlRepository;
 
-    private final LabelMapper labelMapper;
-
-    private final LabelHistoryMapper labelHistoryMapper;
-
     @Value("${aws.bucket}")
-    private  String BUCKET_NAME;
+    private  final String BUCKET_NAME;
 
     private final Logger log = LoggerFactory.getLogger(AttachmentServiceImpl.class);
     @Override
-    public List<ImageOfTaskResProjection> getImagesOfTask(String userId, Boolean qcCheck, Long attId) {
+    public List<ImageOfTaskResDTO> getImagesOfTask(String userId, Boolean qcCheck, Long attId) {
         log.debug("Rest request to get images by taskId: {} ", attId);
         String qcChk = qcCheck ? "Y" : "N";
-        return attachmentRepository.getImagesByTask(userId, qcChk, attId);
-    }
-
-    private String generateUrl(String path) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("https://");
-        sb.append(BUCKET_NAME);
-        sb.append(".amazonaws.com");
-        sb.append(path);
-        return sb.toString();
+        List<Tuple> imagesByTask = attachmentRepository.getImagesByTask(userId, qcChk, attId);
+        return imagesByTask.stream().map(tuple -> {
+            ImageOfTaskResDTO imageOfTaskResDTO = new ImageOfTaskResDTO();
+            imageOfTaskResDTO.setAttSeq(tuple.get(0, Integer.class));
+            imageOfTaskResDTO.setDtlSeq(tuple.get(1, Integer.class));
+            imageOfTaskResDTO.setName(tuple.get(2, String.class));
+            imageOfTaskResDTO.setPath(tuple.get(3, String.class));
+            imageOfTaskResDTO.setExt(tuple.get(4, String.class));
+            imageOfTaskResDTO.setSize(tuple.get(5, Integer.class));
+            imageOfTaskResDTO.setStatus(tuple.get(6, String.class));
+            imageOfTaskResDTO.setUrl("https://"+BUCKET_NAME+".s3.amazonaws.com/"+tuple.get(2, String.class));
+            return imageOfTaskResDTO;
+        }).collect(Collectors.toList());
     }
 
     @Override
