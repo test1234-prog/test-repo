@@ -1,12 +1,7 @@
-
 spring:
-  datasource:
-    url: jdbc:mariadb://database-6.cbph6zdnic3x.ap-northeast-2.rds.amazonaws.com:3306/bridge
-    username: admin
-    password: kdata4321!
-    driver-class-name: org.mariadb.jdbc.Driver
-  jpa:
-    show-sql: true
+  profiles:
+    active: dev
+
 # ===================================================================
 # Swagger Open-API options
 # ===================================================================
@@ -19,11 +14,3 @@ springdoc:
     operations-sorter: method
     default-models-expand-depth: -1 # set to -1 completely hide the section "Schema"
     filter: true
-
-#bucket name for get images from AWS S3 file storage
-aws:
-  bucket: makesense-s
-
-server:
-  base:
-    url: https://makesense-bridge-production.up.railway.app

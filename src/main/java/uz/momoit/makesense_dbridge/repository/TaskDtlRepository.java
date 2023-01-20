@@ -30,12 +30,13 @@ public interface TaskDtlRepository extends JpaRepository<RootEntity, Long> {
     @Transactional
     @Modifying
     @Query(value = "update TB_TASK_DTL " +
-            "set TASK_DTL_STAT = case " +
-            "when ((select count(dtl_seq) from TB_ATT where dtl_seq = :dtlSeq) = " +
-            "(select count(dtl_seq) from TB_EDU_RESULT where dtl_seq = :dtlSeq and vrifysttus = 2)) then 4 " +
-            "when ((select count(*) from TB_EDU_RESULT e where e.DTL_SEQ = :dtlSeq and VRIFYSTTUS = 3) > 0) then 5 " +
-            "else 2 end " +
-            "where dtl_seq = :dtlSeq", nativeQuery = true)
+                      "set TASK_DTL_STAT = case " +
+                                              "when ((select count(dtl_seq) from TB_ATT where dtl_seq = :dtlSeq) = " +
+                                                    "(select count(dtl_seq) from TB_EDU_RESULT where dtl_seq = :dtlSeq and vrifysttus = 2)) then 4 " +
+                                              "when ((select count(*) from TB_EDU_RESULT e where e.DTL_SEQ = :dtlSeq and VRIFYSTTUS = 3) > 0) then 5 " +
+                                              "else 2 " +
+                                           "end " +
+                    "where dtl_seq = :dtlSeq", nativeQuery = true)
     void checkApprovedImagesOfTask(Long dtlSeq);
 
     @Query(value = "select DTL_SEQ dtlSeq, EDU_SEQ eduSeq, LOGIN_ID loginId, TASK_DTL_PROG taskDtlProg, TASK_DTL_STAT taskDtlStat, QC_ID qcId " +
