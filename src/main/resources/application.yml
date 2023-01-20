@@ -26,4 +26,4 @@ aws:
 
 server:
   base:
-    url: https://makesense-bridge-production.up.railway.app
+    url: http://localhost:8080 #//https://makesense-bridge-production.up.railway.app
