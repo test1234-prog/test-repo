@@ -35,7 +35,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final TaskDtlRepository taskDtlRepository;
 
     @Value("${aws.bucket}")
-    private  final String BUCKET_NAME;
+    private  String BUCKET_NAME;
 
     private final Logger log = LoggerFactory.getLogger(AttachmentServiceImpl.class);
     @Override
@@ -52,9 +52,13 @@ public class AttachmentServiceImpl implements AttachmentService {
             imageOfTaskResDTO.setExt(tuple.get(4, String.class));
             imageOfTaskResDTO.setSize(tuple.get(5, Integer.class));
             imageOfTaskResDTO.setStatus(tuple.get(6, String.class));
-            imageOfTaskResDTO.setUrl("https://"+BUCKET_NAME+".s3.amazonaws.com/"+tuple.get(2, String.class));
+            imageOfTaskResDTO.setUrl(getUrl(tuple));
             return imageOfTaskResDTO;
         }).collect(Collectors.toList());
+    }
+
+    private String getUrl(Tuple tuple) {
+        return "https://" + BUCKET_NAME + ".s3.amazonaws.com" + tuple.get(3, String.class);
     }
 
     @Override
