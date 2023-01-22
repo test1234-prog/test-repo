@@ -37,6 +37,11 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     private final TaskDtlRepository taskDtlRepository;
 
+    private final PointRepository pointRepository;
+
+    private final EduMstRepository eduMstRepository;
+
+
     @Value("${aws.bucket}")
     private  String BUCKET_NAME;
 
@@ -88,17 +93,6 @@ public class AttachmentServiceImpl implements AttachmentService {
               eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0","1");
           }
 
-        //2.get label order
-//        Long aLong = labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
-//                .stream()
-//                .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(LabelOrdersProjection::getLabelOrder)
-//                .findFirst()
-//                .orElse(
-//                    labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
-//                            .stream()
-//                            .map(LabelOrdersProjection::getLabelOrder)
-//                            .max(Long::compareTo).map(x2->x2+1).orElse(0L)
-//                );
         //3. insert or update tb_label_data
         labelRepository.insertLabelData(labelDTO.getAttSeq(),labelDTO.getLabelName(),-1L,labelDTO.getBboxX(),labelDTO.getBboxY(),labelDTO.getBboxWidth(),labelDTO.getBboxHeight(), labelDTO.getImgWidth(), labelDTO.getImgHeight());
         }
@@ -128,7 +122,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         }
 
         // get point from TB_EDU_MST.POINT (the point is given for each image in the same value)
-        Long point = attachmentRepository.getPointByTaskId(taskId);
+        Long point = eduMstRepository.getPointByTaskId(taskId);
         int VRIFYSTTUS;
         //1. update TB_EDU_RESULT
         for(CheckTaskDTO checkTaskDTO : checkTaskDTOS) {
@@ -136,7 +130,7 @@ public class AttachmentServiceImpl implements AttachmentService {
             if(checkTaskDTO.getTaskCheckStatEnum() == TaskCheckStatEnum.OK) {
                 VRIFYSTTUS = 2;
                 //insert data to table TB_POINT
-                attachmentRepository.updateTbPoint(loginId, point, LocalDateTime.now());
+                pointRepository.updateTbPoint(loginId, point, LocalDateTime.now());
                 eduResultRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), qcId, point,LocalDateTime.now());
             }
             //when "REJECTED" button clicked

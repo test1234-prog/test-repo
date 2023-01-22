@@ -33,18 +33,6 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                       "and ('N'= :qcChk and coalesce(e.VRIFYSTTUS,0) not in (2,3) or 'Y' = :qcChk)", nativeQuery = true) // if qcChk = true return all images, else return only not approved images
     List<Tuple> getImagesByTask(String userId, String qcChk, Long dtlSeq);
 
-    @Transactional
-    @Modifying
-    @Query(value = "insert into TB_POINT(login_id, nowpoint, lastupdde) values(:loginId,:point, :now) ", nativeQuery = true)
-    void updateTbPoint(String loginId, Long point, LocalDateTime now);
-
-    @Query(value = "select point " +
-                     "from TB_EDU_MST " +
-                    "where edu_seq = (select edu_seq " +
-                                       "from TB_TASK_DTL " +
-                                      "where dtl_seq = :taskId)", nativeQuery = true)
-    Long getPointByTaskId(Long taskId);
-
     @Query(value = "select att_seq " +
                      "from TB_ATT " +
                     "where dtl_seq = :dtlSeq", nativeQuery = true)
