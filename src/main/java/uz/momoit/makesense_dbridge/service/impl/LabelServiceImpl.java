@@ -14,7 +14,10 @@ import uz.momoit.makesense_dbridge.service.dto.LabelsImportDTO;
 import uz.momoit.makesense_dbridge.domain.projection.TaskDtlProjection;
 import uz.momoit.makesense_dbridge.service.dto.YoloDTO;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,5 +96,20 @@ public class LabelServiceImpl implements LabelService {
             yoloDTO.setYolo4(label.getBboxHeight() * (1 / label.getImgHeight()));
             return yoloDTO;
         }).collect(Collectors.toList());
+    }
+
+    public  void updateLabelOrders(Long dtlSeq) {
+        List<LabelOrdersProjection> labelDataByDtlSeq = labelRepository.getLabelDataByDtlSeq(dtlSeq);
+        Set<String> labelNames = labelDataByDtlSeq.stream().map(LabelOrdersProjection::getLabelName).collect(Collectors.toSet());
+        Long cnt = 0L;
+        Map<String, Long> labelNameAndOrder = new HashMap<>();
+        for (String labelName : labelNames) {
+            labelNameAndOrder.put(labelName, cnt);
+            cnt++;
+        }
+        for (LabelOrdersProjection labelOrdersProjection : labelDataByDtlSeq) {
+            Long aLong = labelNameAndOrder.get(labelOrdersProjection.getLabelName());
+            labelRepository.updateLabelOrder(labelOrdersProjection.getLabelSeq(), aLong);
+        }
     }
 }

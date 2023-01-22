@@ -44,4 +44,19 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
                                          "where DTL_SEQ = :dtlSeq) " +
                  "order by labelOrder", nativeQuery = true)
     List<LabelOrdersProjection> getLabelOrdersByDtlSeq(Long dtlSeq);
+
+
+    @Query(value = "select l.LB_SEQ as labelSeq, l.LABEL_NAME as labelName " +
+                     "from TB_LABEL_DATA l " +
+                    "where l.ATT_SEQ in (select TB_ATT.ATT_SEQ " +
+                                          "from TB_ATT " +
+                                         "where DTL_SEQ = :dtlSeq)", nativeQuery = true)
+    List<LabelOrdersProjection> getLabelDataByDtlSeq(Long dtlSeq);
+
+    @Transactional
+    @Modifying
+    @Query(value = "update TB_LABEL_DATA " +
+                      "set LABEL_ORDER = :labelOrder " +
+                    "where LB_SEQ = :lbSeq", nativeQuery = true)
+    void updateLabelOrder(Long lbSeq, Long labelOrder);
 }

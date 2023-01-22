@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import uz.momoit.makesense_dbridge.domain.enumeration.TaskCheckStatEnum;
 import uz.momoit.makesense_dbridge.repository.*;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
+import uz.momoit.makesense_dbridge.service.LabelService;
 import uz.momoit.makesense_dbridge.service.dto.*;
 import uz.momoit.makesense_dbridge.domain.projection.LabelOrdersProjection;
 import uz.momoit.makesense_dbridge.domain.projection.TaskDtlProjection;
@@ -25,6 +26,8 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final AttachmentRepository attachmentRepository;
 
     private final LabelRepository labelRepository;
+
+    private final LabelService labelService;
 
     private final LabelHistoryRepository labelHistoryRepository;
 
@@ -86,19 +89,22 @@ public class AttachmentServiceImpl implements AttachmentService {
           }
 
         //2.get label order
-        Long aLong = labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
-                .stream()
-                .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(LabelOrdersProjection::getLabelOrder)
-                .findFirst()
-                .orElse(
-                    labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
-                            .stream()
-                            .map(LabelOrdersProjection::getLabelOrder)
-                            .max(Long::compareTo).map(x2->x2+1).orElse(0L)
-                );
+//        Long aLong = labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
+//                .stream()
+//                .filter(x -> x.getLabelName().equals(labelDTO.getLabelName())).map(LabelOrdersProjection::getLabelOrder)
+//                .findFirst()
+//                .orElse(
+//                    labelRepository.getLabelOrderIdByAttSeqAndName(labelDTO.getAttSeq())
+//                            .stream()
+//                            .map(LabelOrdersProjection::getLabelOrder)
+//                            .max(Long::compareTo).map(x2->x2+1).orElse(0L)
+//                );
         //3. insert or update tb_label_data
-        labelRepository.insertLabelData(labelDTO.getAttSeq(),labelDTO.getLabelName(),aLong,labelDTO.getBboxX(),labelDTO.getBboxY(),labelDTO.getBboxWidth(),labelDTO.getBboxHeight(), labelDTO.getImgWidth(), labelDTO.getImgHeight());
+        labelRepository.insertLabelData(labelDTO.getAttSeq(),labelDTO.getLabelName(),-1L,labelDTO.getBboxX(),labelDTO.getBboxY(),labelDTO.getBboxWidth(),labelDTO.getBboxHeight(), labelDTO.getImgWidth(), labelDTO.getImgHeight());
         }
+
+        //update label_order in TB_LABEL_DATA
+        labelService.updateLabelOrders(dtlSeq);
         //3. update TB_TASK_DTL
         taskDtlRepository.updateTaskDtlProg(dtlSeq);
         taskDtlRepository.updateTaskDtlStatus(dtlSeq);

@@ -9,4 +9,6 @@ public interface LabelService {
     List<LabelsImportDTO> convertLabelToYolo(Long dtlSeq);
 
     List<LabelOrdersProjection> getLabelOrders(Long dtlSeq);
+
+    void updateLabelOrders(Long dtlSeq);
 }
