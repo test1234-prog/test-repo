@@ -139,7 +139,6 @@ public class AttachmentServiceImpl implements AttachmentService {
 
                 //all label values belong to image to insert TB_LABEL_DATA_HISTORY table
                 labelHistoryRepository.saveLabelHistory(checkTaskDTO.getAttSeq());
-                //TODO TB_EDU_RESULT_HISTORY
                 eduResultHistoryRepository.savedEduResultHistory(checkTaskDTO.getAttSeq());
                 eduResultRepository.updateEduResult(VRIFYSTTUS, checkTaskDTO.getAttSeq(), qcId, 0L, LocalDateTime.now());
             }
@@ -148,7 +147,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         //2. Update TB_TASK_DTL (All images approved TASK_DTL_STAT = 4, at least one rejected TASK_DTL_STAT = 5)
         taskDtlRepository.checkApprovedImagesOfTask(taskId);
 
-        //3. Inset TB_EDU_RESULT(All images approved VRIFYSTTUS = 2, at least one rejected VRIFYSTTUS = 3)
+
         log.debug("successfully checked task with taskId: {} ", taskId);
     }
 }
