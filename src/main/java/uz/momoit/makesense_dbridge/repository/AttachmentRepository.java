@@ -30,7 +30,7 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                        "on  e.ATT_SEQ = t.ATT_SEQ " +
                     "where t.dtl_seq = :dtlSeq " +
                       "and (d.LOGIN_ID = :userId or 'Y' = :qcChk) " +
-                      "and ('N'= :qcChk and coalesce(e.VRIFYSTTUS,0) not in (2,3) or 'Y' = :qcChk)", nativeQuery = true) // if qcChk = true return all images, else return only not approved images
+                      "and ('N'= :qcChk and coalesce(e.VRIFYSTTUS,0) not in (2) or 'Y' = :qcChk)", nativeQuery = true) // if qcChk = true return all images, else return only not approved images
     List<Tuple> getImagesByTask(String userId, String qcChk, Long dtlSeq);
 
     @Query(value = "select att_seq " +
