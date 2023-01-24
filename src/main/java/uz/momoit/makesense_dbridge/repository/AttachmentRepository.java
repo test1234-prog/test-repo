@@ -39,4 +39,12 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
     List<Long> getAttachmentIdsByDtSeq(Long dtlSeq);
 
 
+    @Query(value = "select * " +
+                     "from TB_ATT " +
+                    "where DTL_SEQ = :dtlSeq", nativeQuery = true)
+    List<Long> getAttachmentSeqs(Long dtlSeq);
+
+
+    @Query(value = "select name from TB_ATT where ATT_SEQ = :attSeq", nativeQuery = true)
+    String getFileNameByAttSeq(Long attSeq);
 }
