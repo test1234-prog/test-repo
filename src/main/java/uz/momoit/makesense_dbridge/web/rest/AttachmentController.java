@@ -11,7 +11,9 @@ import uz.momoit.makesense_dbridge.service.LabelService;
 import uz.momoit.makesense_dbridge.service.dto.*;
 import uz.momoit.makesense_dbridge.domain.projection.LabelOrdersProjection;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.*;
@@ -76,5 +78,17 @@ public class AttachmentController {
     public List<LabelOrdersProjection> getLabelOrders(@RequestParam Long dtlSeq) {
         log.debug("Rest request to get files, taskId: {} ", dtlSeq);
         return labelService.getLabelOrders(dtlSeq);
+    }
+
+    @GetMapping(value = "/get-image-ids/{dtlSeq}")
+    public List<Long>attSeqs(@PathVariable Long dtlSeq) {
+        log.debug("Rest request to get files, taskId: {} ", dtlSeq);
+        return attachmentService.getAttachmentSeqs(dtlSeq);
+    }
+
+    @GetMapping(value = "/create-file-for-import-annotation/{attSeq}")
+    public void createFile(HttpServletResponse response, @PathVariable Long attSeq) throws IOException {
+        log.debug("Rest request to get files, taskId: {} ", attSeq);
+        attachmentService.createFileForImportAnnotation(response, attSeq);
     }
 }

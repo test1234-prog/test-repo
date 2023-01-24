@@ -85,7 +85,7 @@ public class LabelServiceImpl implements LabelService {
         return labelRepository.getLabelOrdersByDtlSeq(dtlSeq);
     }
 
-    private List<YoloDTO> getYoloDTOByAttSeq(Long attSeq) {
+    public List<YoloDTO> getYoloDTOByAttSeq(Long attSeq) {
         log.debug("Rest request to get yoloDTO by attSeq: {} ", attSeq);
         return labelRepository.getLabelsByAttSeq(attSeq).stream().map(label -> {
             YoloDTO yoloDTO = new YoloDTO();

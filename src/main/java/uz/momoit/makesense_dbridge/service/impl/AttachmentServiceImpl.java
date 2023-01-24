@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uz.momoit.makesense_dbridge.domain.Label;
 import uz.momoit.makesense_dbridge.domain.enumeration.TaskCheckStatEnum;
 import uz.momoit.makesense_dbridge.repository.*;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
@@ -15,6 +16,9 @@ import uz.momoit.makesense_dbridge.domain.projection.TaskDtlProjection;
 import uz.momoit.makesense_dbridge.web.rest.errors.BadRequestAlertException;
 
 import javax.persistence.Tuple;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -149,5 +153,34 @@ public class AttachmentServiceImpl implements AttachmentService {
 
 
         log.debug("successfully checked task with taskId: {} ", taskId);
+    }
+
+    @Override
+    public List<Long> getAttachmentSeqs(Long dtlSeq) {
+        return attachmentRepository.getAttachmentIdsByDtSeq(dtlSeq);
+    }
+
+    @Override
+    public void createFileForImportAnnotation(HttpServletResponse response, Long attSeq) throws IOException {
+        response.setContentType("text/csv");
+
+        response.setHeader("Content-Disposition", "attachment; filename="+getFileName(attSeq)+".txt");
+        ServletOutputStream out  = response.getOutputStream();
+        List<YoloDTO> yoloDTOByAttSeq = labelService.getYoloDTOByAttSeq(attSeq);
+        for(YoloDTO yoloDTO : yoloDTOByAttSeq) {
+            out.println(yoloDTO.getLabelOrder() + " " + yoloDTO.getYolo1() + " " + yoloDTO.getYolo2() + " " + yoloDTO.getYolo3() + " " + yoloDTO.getYolo4());
+        }
+        out.flush();
+        out.close();
+    }
+
+    @Override
+    public String getFileName(Long attSeq) {
+        if (attachmentRepository.getFileNameByAttSeq(attSeq) != null) {
+            String fileName = attachmentRepository.getFileNameByAttSeq(attSeq);
+            int index = fileName.indexOf(".");
+            return fileName.substring(0, index);
+        }
+        return null;
     }
 }
