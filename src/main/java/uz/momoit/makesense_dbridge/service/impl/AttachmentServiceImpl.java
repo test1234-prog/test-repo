@@ -163,7 +163,6 @@ public class AttachmentServiceImpl implements AttachmentService {
     @Override
     public void createFileForImportAnnotation(HttpServletResponse response, Long attSeq) throws IOException {
         response.setContentType("text/csv");
-
         response.setHeader("Content-Disposition", "attachment; filename="+getFileName(attSeq)+".txt");
         ServletOutputStream out  = response.getOutputStream();
         List<YoloDTO> yoloDTOByAttSeq = labelService.getYoloDTOByAttSeq(attSeq);
@@ -182,5 +181,18 @@ public class AttachmentServiceImpl implements AttachmentService {
             return fileName.substring(0, index);
         }
         return null;
+    }
+
+    @Override
+    public void createLabels(HttpServletResponse response, Long dtlSeq) throws IOException {
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=labels.txt");
+        ServletOutputStream out  = response.getOutputStream();
+        List<LabelOrdersProjection> labelOrders = labelService.getLabelOrders(dtlSeq);
+        for(LabelOrdersProjection label : labelOrders) {
+            out.println(label.getLabelOrder() + " " + label.getLabelName());
+        }
+        out.flush();
+        out.close();
     }
 }
