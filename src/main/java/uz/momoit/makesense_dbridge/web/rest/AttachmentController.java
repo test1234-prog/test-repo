@@ -91,4 +91,10 @@ public class AttachmentController {
         log.debug("Rest request to get files, taskId: {} ", attSeq);
         attachmentService.createFileForImportAnnotation(response, attSeq);
     }
+
+    @GetMapping(value = "/get-labels/{dtlSeq}")
+    public void createLabels(HttpServletResponse response, @PathVariable Long dtlSeq) throws IOException {
+        log.debug("Rest request to get files, taskId: {} ", dtlSeq);
+        attachmentService.createLabels(response, dtlSeq);
+    }
 }

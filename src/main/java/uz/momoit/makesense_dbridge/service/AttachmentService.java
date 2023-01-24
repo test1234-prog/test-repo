@@ -21,4 +21,6 @@ public interface AttachmentService {
     void createFileForImportAnnotation(HttpServletResponse response, Long attSeq) throws IOException;
 
     String getFileName(Long attSeq);
+
+    void createLabels(HttpServletResponse response, Long dtlSeq) throws IOException;
 }
