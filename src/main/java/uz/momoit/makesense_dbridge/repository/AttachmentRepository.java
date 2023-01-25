@@ -22,7 +22,7 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                                                                           "when e.VRIFYSTTUS = 3 then 'REJECTED' " +
                                                                      "end "+
                                                                     "from TB_EDU_RESULT e " +
-                                                                   "where e.ATT_SEQ = t.ATT_SEQ), 'UNDONE') status " +
+                                                                   "where e.ATT_SEQ = t.ATT_SEQ), 'UNDONE') status, d.LOGIN_ID userId, d.QC_ID qcId " +
                      "from TB_ATT t " +
                      "join TB_TASK_DTL d " +
                        "on t.DTL_SEQ = d.DTL_SEQ " +

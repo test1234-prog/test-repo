@@ -64,6 +64,8 @@ public class AttachmentServiceImpl implements AttachmentService {
             imageOfTaskResDTO.setExt(tuple.get(4, String.class));
             imageOfTaskResDTO.setSize(tuple.get(5, Integer.class));
             imageOfTaskResDTO.setStatus(tuple.get(6, String.class));
+            imageOfTaskResDTO.setUserId(tuple.get(7, String.class));
+            imageOfTaskResDTO.setQcId(tuple.get(8, String.class));
             imageOfTaskResDTO.setUrl(getUrl(tuple));
             return imageOfTaskResDTO;
         }).collect(Collectors.toList());

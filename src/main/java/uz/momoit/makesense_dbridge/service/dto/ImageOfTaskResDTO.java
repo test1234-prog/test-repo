@@ -20,4 +20,6 @@ public class ImageOfTaskResDTO {
     private Integer size;
     private String status;
     private String url;
+    private String userId;
+    private String qcId;
 }
