@@ -162,10 +162,14 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public void createFileForImportAnnotation(HttpServletResponse response, Long attSeq) throws IOException {
+        log.debug("Rest request to create file for import annotation with attSeq: {} ", attSeq);
+        List<YoloDTO> yoloDTOByAttSeq = labelService.getYoloDTOByAttSeq(attSeq);
+        if (yoloDTOByAttSeq.size() == 0) {
+            throw new BadRequestAlertException("No data to export", "Label", "noDataToExport");
+        }
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename="+getFileName(attSeq)+".txt");
         ServletOutputStream out  = response.getOutputStream();
-        List<YoloDTO> yoloDTOByAttSeq = labelService.getYoloDTOByAttSeq(attSeq);
         for(YoloDTO yoloDTO : yoloDTOByAttSeq) {
             out.println(yoloDTO.getLabelOrder() + " " + yoloDTO.getYolo1() + " " + yoloDTO.getYolo2() + " " + yoloDTO.getYolo3() + " " + yoloDTO.getYolo4());
         }
@@ -185,10 +189,14 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public void createLabels(HttpServletResponse response, Long dtlSeq) throws IOException {
+        log.debug("Rest request to create labels with dtlSeq: {} ", dtlSeq);
+        List<LabelOrdersProjection> labelOrders = labelService.getLabelOrders(dtlSeq);
+        if(labelOrders.size() == 0) {
+            throw new BadRequestAlertException("No data to export", "Label", "noDataToExport");
+        }
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename=labels.txt");
         ServletOutputStream out  = response.getOutputStream();
-        List<LabelOrdersProjection> labelOrders = labelService.getLabelOrders(dtlSeq);
         for(LabelOrdersProjection label : labelOrders) {
             out.println(label.getLabelOrder() + " " + label.getLabelName());
         }

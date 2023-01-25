@@ -80,19 +80,17 @@ public class AttachmentController {
         return labelService.getLabelOrders(dtlSeq);
     }
 
-    @GetMapping(value = "/get-image-ids/{dtlSeq}")
-    public List<Long>attSeqs(@PathVariable Long dtlSeq) {
-        log.debug("Rest request to get files, taskId: {} ", dtlSeq);
-        return attachmentService.getAttachmentSeqs(dtlSeq);
-    }
-
     @GetMapping(value = "/create-file-for-import-annotation/{attSeq}")
+    @Operation(summary = "get data for import annotation",
+               description = "get data YOLO format for import annotation")
     public void createFile(HttpServletResponse response, @PathVariable Long attSeq) throws IOException {
         log.debug("Rest request to get files, taskId: {} ", attSeq);
         attachmentService.createFileForImportAnnotation(response, attSeq);
     }
 
     @GetMapping(value = "/get-labels/{dtlSeq}")
+    @Operation(summary = "get labels by task id",
+               description = "get labels by task id")
     public void createLabels(HttpServletResponse response, @PathVariable Long dtlSeq) throws IOException {
         log.debug("Rest request to get files, taskId: {} ", dtlSeq);
         attachmentService.createLabels(response, dtlSeq);
