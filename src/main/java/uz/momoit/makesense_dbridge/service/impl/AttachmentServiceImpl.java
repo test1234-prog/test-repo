@@ -198,7 +198,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         response.setHeader("Content-Disposition", "attachment; filename=labels.txt");
         ServletOutputStream out  = response.getOutputStream();
         for(LabelOrdersProjection label : labelOrders) {
-            out.println(label.getLabelOrder() + " " + label.getLabelName());
+            out.println(label.getLabelName());
         }
         out.flush();
         out.close();
