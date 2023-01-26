@@ -5,7 +5,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import uz.momoit.makesense_dbridge.domain.Label;
 import uz.momoit.makesense_dbridge.domain.enumeration.TaskCheckStatEnum;
 import uz.momoit.makesense_dbridge.repository.*;
 import uz.momoit.makesense_dbridge.service.AttachmentService;
@@ -133,7 +132,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         //1. update TB_EDU_RESULT
         for(CheckTaskDTO checkTaskDTO : checkTaskDTOS) {
             //when "OK" button clicked
-            if(checkTaskDTO.getTaskCheckStatEnum() == TaskCheckStatEnum.OK) {
+            if(checkTaskDTO.getTaskCheckStatEnum() == TaskCheckStatEnum.APPROVED) {
                 VRIFYSTTUS = 2;
                 //insert data to table TB_POINT
                 pointRepository.updateTbPoint(loginId, point, LocalDateTime.now());
