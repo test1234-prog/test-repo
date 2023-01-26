@@ -157,11 +157,6 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public List<Long> getAttachmentSeqs(Long dtlSeq) {
-        return attachmentRepository.getAttachmentIdsByDtSeq(dtlSeq);
-    }
-
-    @Override
     public void createFileForImportAnnotation(HttpServletResponse response, Long attSeq) throws IOException {
         log.debug("Rest request to create file for import annotation with attSeq: {} ", attSeq);
         List<YoloDTO> yoloDTOByAttSeq = labelService.getYoloDTOByAttSeq(attSeq);

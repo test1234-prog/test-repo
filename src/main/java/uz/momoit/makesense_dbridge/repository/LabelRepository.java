@@ -5,10 +5,10 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import uz.momoit.makesense_dbridge.domain.Label;
 import uz.momoit.makesense_dbridge.domain.projection.LabelOrdersProjection;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 @Repository
@@ -18,14 +18,18 @@ public interface LabelRepository extends JpaRepository<Label, Long> {
                     "where att_seq = :attSeq", nativeQuery = true)
     List<Label> getLabelsByAttSeq(Long attSeq);
 
-    @Query(value = "insert into TB_LABEL_DATA(att_seq,label_name, label_order, bbox_x, bbox_y, bbox_width, bbox_height, img_width, img_height)" +
-            " values(:att_seq, :label_name, :label_order, :bbox_x, :bbox_y, :bbox_width, :bbox_height, :img_width, :img_height)", nativeQuery = true)
+    @Modifying
+    @Transactional
+    @Query(value = "insert into TB_LABEL_DATA(att_seq,label_name, label_order, bbox_x, bbox_y, bbox_width, bbox_height, img_width, img_height) " +
+                   "values(:att_seq, :label_name, :label_order, :bbox_x, :bbox_y, :bbox_width, :bbox_height, :img_width, :img_height)", nativeQuery = true)
     void insertLabelData(Long att_seq, String label_name, Long label_order, int bbox_x, int bbox_y, int bbox_width, int bbox_height, int img_width, int img_height);
 
 
     @Transactional
     @Modifying
-    @Query(value = "delete from TB_LABEL_DATA where ATT_SEQ in :ids ", nativeQuery = true)
+    @Query(value = "delete " +
+                     "from TB_LABEL_DATA " +
+                    "where ATT_SEQ in :ids ", nativeQuery = true)
     void deleteLabelData(@Param("ids")List<Long> ids);
 
     @Query(value = "select l.LABEL_ORDER as labelOrder, l.LABEL_NAME as labelName " +

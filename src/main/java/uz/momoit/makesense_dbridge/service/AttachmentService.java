@@ -16,8 +16,6 @@ public interface AttachmentService {
 
     void checkTask(List<CheckTaskDTO> checkTaskDTOS, Long taskId, String loginId, String qcId);
 
-    List<Long> getAttachmentSeqs(Long dtlSeq);
-
     void createFileForImportAnnotation(HttpServletResponse response, Long attSeq) throws IOException;
 
     String getFileName(Long attSeq);
