@@ -106,7 +106,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         labelService.updateLabelOrders(dtlSeq);
         //3. update TB_TASK_DTL
         taskDtlRepository.updateTaskDtlProg(dtlSeq);
-        taskDtlRepository.updateTaskDtlStatus(dtlSeq);
+        taskDtlRepository.updateTaskDtlStatus(dtlSeq); //after saved label TB_TASK_DETAIL status is changed to all task is done then status = 3 else 2
         log.debug("Successfully saved labels with dtlSeq: {} ", dtlSeq);
     }
 
