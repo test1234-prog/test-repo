@@ -18,7 +18,8 @@ public interface TaskDtlRepository extends JpaRepository<RootEntity, Long> {
                                  "(100 * (select count(*) " +
                                            "from TB_EDU_RESULT e " +
                                           "where e.DTL_SEQ = :dtl_seq " +
-                                            "and e.STATUS = 'OK')/" +
+                                            "and e.STATUS = 'OK'" +
+                                            "and e.STATUS <> '3')/" +
                                  "(select count(t.ATT_SEQ) from TB_ATT t where t.DTL_SEQ = :dtl_seq)) " +
                    "where DTL_SEQ = :dtl_seq", nativeQuery = true)
     void updateTaskDtlProg(Long dtl_seq);
@@ -26,9 +27,11 @@ public interface TaskDtlRepository extends JpaRepository<RootEntity, Long> {
     @Transactional
     @Modifying
     @Query(value = "update TB_TASK_DTL " +
-                      "set TASK_DTL_PROG = 100 " +
-                    "where DTL_SEQ = :dtl_seq " +
-                      "and TASK_DTL_PROG = 100", nativeQuery = true)
+                      "set TASK_DTL_STAT = case " +
+                                               "when TASK_DTL_PROG = 100 then 3 " +
+                                                "else 2 " +
+                                           "end " +
+                    "where DTL_SEQ = :dtl_seq " , nativeQuery = true)
     void updateTaskDtlStatus(Long dtl_seq);
 
     @Transactional
