@@ -19,7 +19,7 @@ public interface TaskDtlRepository extends JpaRepository<RootEntity, Long> {
                                            "from TB_EDU_RESULT e " +
                                           "where e.DTL_SEQ = :dtl_seq " +
                                             "and e.STATUS = 'OK'" +
-                                            "and e.STATUS <> '3')/" +
+                                            "and e.VRIFYSTTUS <> '3')/" +
                                  "(select count(t.ATT_SEQ) from TB_ATT t where t.DTL_SEQ = :dtl_seq)) " +
                    "where DTL_SEQ = :dtl_seq", nativeQuery = true)
     void updateTaskDtlProg(Long dtl_seq);
