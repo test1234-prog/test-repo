@@ -4,27 +4,31 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import uz.momoit.makesense_dbridge.service.dto.RootEntity;
 import uz.momoit.makesense_dbridge.domain.projection.TaskDtlProjection;
-
-import javax.transaction.Transactional;
 
 @Repository
 public interface TaskDtlRepository extends JpaRepository<RootEntity, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "update TB_TASK_DTL set TASK_DTL_PROG = " +
-            "(100*(select count(*) from TB_EDU_RESULT e where e.DTL_SEQ = :dtl_seq and e.STATUS = 'OK')/" +
-            "(select count(t.ATT_SEQ) from TB_ATT t where t.DTL_SEQ = :dtl_seq)) " +
-            "where DTL_SEQ = :dtl_seq", nativeQuery = true)
+    @Query(value = "update TB_TASK_DTL " +
+                     "set TASK_DTL_PROG = " +
+                                 "(100 * (select count(*) " +
+                                           "from TB_EDU_RESULT e " +
+                                          "where e.DTL_SEQ = :dtl_seq " +
+                                            "and e.STATUS = 'OK')/" +
+                                 "(select count(t.ATT_SEQ) from TB_ATT t where t.DTL_SEQ = :dtl_seq)) " +
+                   "where DTL_SEQ = :dtl_seq", nativeQuery = true)
     void updateTaskDtlProg(Long dtl_seq);
 
     @Transactional
     @Modifying
-    @Query(value = "update TB_TASK_DTL set TASK_DTL_PROG = 100 " +
-            "where DTL_SEQ = :dtl_seq " +
-            "and TASK_DTL_PROG = 100", nativeQuery = true)
+    @Query(value = "update TB_TASK_DTL " +
+                      "set TASK_DTL_PROG = 100 " +
+                    "where DTL_SEQ = :dtl_seq " +
+                      "and TASK_DTL_PROG = 100", nativeQuery = true)
     void updateTaskDtlStatus(Long dtl_seq);
 
     @Transactional
