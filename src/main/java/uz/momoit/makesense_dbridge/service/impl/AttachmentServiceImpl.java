@@ -82,6 +82,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         if(eduResultRepository.checkExistsApprovedImage(attSeqIds) > 0) {
             throw new BadRequestAlertException("Image is approved, it is not edit", "Attachment", "imageApproved");
         }
+        List<Long> rejectedImageIds = eduResultRepository.getRejectedImageIds(dtlSeq);
 
         // save TB_LABEL_DATA_HISTORY table
         for (Long attSeqId : attSeqIds) {
@@ -92,10 +93,16 @@ public class AttachmentServiceImpl implements AttachmentService {
 
         for(LabelDTO labelDTO : labelDTOS) {
           //1. insert or update tb_edu_result
+          String VRIFYSTTUS;
           if(eduResultRepository.checkEduResult(labelDTO.getAttSeq()) == 0) {
               //insert
+              if(rejectedImageIds.stream().equals(labelDTO.getAttSeq())) {
+                  VRIFYSTTUS = "4"; // reworked labelled image after rejected image
+              } else {
+                  VRIFYSTTUS = "1"; //firstly labelled image
+              }
               TaskDtlProjection taskDtl = taskDtlRepository.getTaskDtl(labelDTO.getAttSeq());
-              eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0","1");
+              eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0",VRIFYSTTUS);
           }
 
         //3. insert or update tb_label_data
