@@ -17,6 +17,7 @@ public interface AttachmentRepository extends JpaRepository<RootEntity, Integer>
                                                                           "when e.VRIFYSTTUS = 1 then 'UNCHECKED' " +
                                                                           "when e.VRIFYSTTUS = 2 then 'APPROVED' " +
                                                                           "when e.VRIFYSTTUS = 3 then 'REJECTED' " +
+                                                                          "when e.VRIFYSTTUS = 4 then 'REWORKED' " +
                                                                      "end "+
                                                                     "from TB_EDU_RESULT e " +
                                                                    "where e.ATT_SEQ = t.ATT_SEQ), 'UNDONE') status, d.LOGIN_ID userId, d.QC_ID qcId " +
