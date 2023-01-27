@@ -96,16 +96,13 @@ public class AttachmentServiceImpl implements AttachmentService {
           String VRIFYSTTUS;
           if(eduResultRepository.checkEduResult(labelDTO.getAttSeq()) == 0) {
               //insert
-              if(rejectedImageIds.contains(labelDTO.getAttSeq())) {
-                  VRIFYSTTUS = "4"; // reworked labelled image after rejected image
-              } else {
-                  VRIFYSTTUS = "1"; //firstly labelled image
-              }
               TaskDtlProjection taskDtl = taskDtlRepository.getTaskDtl(labelDTO.getAttSeq());
-              eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0",VRIFYSTTUS);
+              eduResultRepository.insertEduResult(taskDtl.getLoginId(), taskDtl.getEduSeq(), taskDtl.getDtlSeq(), labelDTO.getAttSeq(), "OK", "0","1");
+          } else if(rejectedImageIds.contains(labelDTO.getAttSeq())) {
+              eduResultRepository.updateEduResult(4,labelDTO.getAttSeq(), null, 0L, null);// reworked labelled image after rejected image
           }
 
-        //3. insert or update tb_label_data
+        //2. insert or update tb_label_data
         labelRepository.insertLabelData(labelDTO.getAttSeq(),labelDTO.getLabelName(),-1L,labelDTO.getBboxX(),labelDTO.getBboxY(),labelDTO.getBboxWidth(),labelDTO.getBboxHeight(), labelDTO.getImgWidth(), labelDTO.getImgHeight());
         }
 
@@ -156,7 +153,9 @@ public class AttachmentServiceImpl implements AttachmentService {
             }
         }
 
-        //2. Update TB_TASK_DTL (All images approved TASK_DTL_STAT = 4, at least one rejected TASK_DTL_STAT = 5)
+        //2. update TB_TASK_DTL table because, if image is rejected, TASK_DTL_PROG colum value will change
+        taskDtlRepository.updateTaskDtlProg(taskId);
+        //3. Update TB_TASK_DTL (All images approved TASK_DTL_STAT = 4, at least one rejected TASK_DTL_STAT = 5)
         taskDtlRepository.checkApprovedImagesOfTask(taskId);
 
 
