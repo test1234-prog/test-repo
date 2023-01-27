@@ -82,7 +82,7 @@ public class AttachmentServiceImpl implements AttachmentService {
         if(eduResultRepository.checkExistsApprovedImage(attSeqIds) > 0) {
             throw new BadRequestAlertException("Image is approved, it is not edit", "Attachment", "imageApproved");
         }
-        List<Long> rejectedImageIds = eduResultRepository.getRejectedImageIds(dtlSeq);
+        List<Integer> rejectedImageIds = eduResultRepository.getRejectedImageIds(dtlSeq);
 
         // save TB_LABEL_DATA_HISTORY table
         for (Long attSeqId : attSeqIds) {
@@ -96,7 +96,7 @@ public class AttachmentServiceImpl implements AttachmentService {
           String VRIFYSTTUS;
           if(eduResultRepository.checkEduResult(labelDTO.getAttSeq()) == 0) {
               //insert
-              if(rejectedImageIds.stream().equals(labelDTO.getAttSeq())) {
+              if(rejectedImageIds.contains(labelDTO.getAttSeq())) {
                   VRIFYSTTUS = "4"; // reworked labelled image after rejected image
               } else {
                   VRIFYSTTUS = "1"; //firstly labelled image
