@@ -50,5 +50,5 @@ public interface EduResultRepository extends JpaRepository<RootEntity, Long> {
                                         "from TB_ATT t " +
                                        "where t.DTL_SEQ = :dtlSeq  ) " +
                       "and VRIFYSTTUS = 3", nativeQuery = true)
-    List<Long> getRejectedImageIds(Long dtlSeq);
+    List<Integer> getRejectedImageIds(Long dtlSeq);
 }
