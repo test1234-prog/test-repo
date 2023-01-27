@@ -44,4 +44,11 @@ public interface EduResultRepository extends JpaRepository<RootEntity, Long> {
                       "and VRIFYSTTUS = 2", nativeQuery = true)
     Long checkExistsApprovedImage(@Param("attSeqId") List<Long> attSeqId);
 
+    @Query(value = "select ATT_SEQ " +
+                     "from TB_EDU_RESULT " +
+                    "where ATT_SEQ in (select t.ATT_SEQ " +
+                                        "from TB_ATT t " +
+                                       "where t.DTL_SEQ = :dtlSeq  ) " +
+                      "and VRIFYSTTUS = 3", nativeQuery = true)
+    List<Long> getRejectedImageIds(Long dtlSeq);
 }
